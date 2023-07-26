@@ -1,11 +1,53 @@
-<body>
-{% if latest_book_list %}
-    <ul>
-    {% for book in latest_book_list %}
-        <li><a href="{% url 'library_app:detail' book.isbn %}">{{ book.book_title }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No books are available.</p>
-{% endif %}
-</body>
+{% extends 'base.html' %}
+{% block title %} Home {% endblock %}
+
+{% block content %}
+    <main>
+        <div class="container-fluid">
+            <h1>
+                City Public Library
+            </h1>
+            <p>
+                Welcome to the City Public Library's adminstrative site
+            </p>
+        </div>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col">
+                    <a href="/members">
+                        <h2>Members &rarr;</h2>
+                        <p>See registered members.</p>
+                    </a>
+                </div>
+                <div class="col">
+                    <a href="/libraries">
+                        <h2>Libraries &rarr;</h2>
+                        <p>See the libraries registered.</p>
+                    </a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <a href="/">
+                        <h2>Books & Authors &rarr;</h2>
+                        <p>See books and authors.</p>
+                    </a>
+                </div>
+                <div class="col">
+                    <a href="/">
+                        <h2>Rentals &rarr;</h2>
+                        <p>See the rentals.</p>
+                    </a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <a href="/">
+                        <h2>Resources &rarr;</h2>
+                        <p>See resources.</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock %}

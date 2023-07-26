@@ -3,12 +3,16 @@ from . import views
 
 app_name = "library_app"
 urlpatterns = [
-    # ex: /polls/
+    # home page
     path("", views.index, name="index"),
-    # ex: /polls/5/
+    # members page
+    path("members/", views.MembersView.as_view(), name="members"),
+    # add member
+    path("members/add_member", views.get_member_info, name="add-member"),
+    # ex: /9781594133299
     path("<str:isbn>/", views.detail, name="detail"),
-    # ex: /polls/5/results/
+    # ex:
     path("<int:question_id>/results/", views.results, name="results"),
-    # ex: /polls/5/vote/
+    # ex:
     path("<int:question_id>/vote/", views.vote, name="vote"),
 ]
