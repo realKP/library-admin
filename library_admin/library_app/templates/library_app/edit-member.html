@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %} Edit Member {% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <h1>Edit Member: {{member.member_id}}</h1>
+        <p>Here you can edit a member's personal information and rentals</p>
+    </div>
+    <div class="container-fluid">
+        <form action="{% url 'library_app:edit-member' pk=member.member_id %}" method="post">
+            {% csrf_token %}
+            {{ form }}
+            <div class="container-fluid">
+                <input type="submit" class="btn btn-primary" value="Update">
+                <input type="hidden" name="_method" value="PATCH" />
+            </div>
+        </form>
+    </div>
+{% endblock %}

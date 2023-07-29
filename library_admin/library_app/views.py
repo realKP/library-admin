@@ -1,7 +1,8 @@
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
-from django.views import generic
+from django.views import generic, View
+from django.template import RequestContext
 from .forms import MemberForm
 from .models import Member, Library, Book, Author, Resource, Rental, RentalItem, BookAuthor
 
@@ -34,12 +35,54 @@ class MembersView(generic.ListView):
             return HttpResponseRedirect(reverse("library_app:members"))
 
 
+class DeleteMember(View):
+    http_method_names = ['delete']
+
+    def dispatch(self, *args, **kwargs):
+        method = self.request.POST.get('_method', '').lower()
+        if method == 'delete':
+            return self.delete(*args, **kwargs)
+        else:
+            return super(DeleteMember, self).dispatch(*args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        member = get_object_or_404(Member, pk=kwargs['pk'])
+        member.delete()
+        return HttpResponseRedirect(reverse("library_app:members"))
+
+
+class EditMemberView(generic.DetailView):
+    http_method_names = ['get', 'patch']
+    model = Member
+    template_name = "library_app/edit-member.html"
+    context_object_name = "member"
+
+    def dispatch(self, *args, **kwargs):
+        method = self.request.POST.get('_method', '').lower()
+        if method == 'patch':
+            return self.patch(*args, **kwargs)
+        else:
+            return super(EditMemberView, self).dispatch(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        # every request (GET or POST) receives blank form for modal
+        context = super().get_context_data(**kwargs)
+        form = MemberForm({
+            "member_first_name": self.object.member_first_name,
+            "member_last_name": self.object.member_last_name,
+            "member_phone": self.object.member_phone,
+            "member_email": self.object.member_email
+        })
+        context["form"] = form
+        return context
+
+    def patch(self, request, *args, **kwargs):
+        member = get_object_or_404(Member, pk=kwargs['pk'])
+        print(request.POST.)
+        return HttpResponse('done')
+        # return HttpResponseRedirect(reverse("library_app:members",'something'))
+
 ##########################################################
-
-# def detail(request, isbn):
-#     book = get_object_or_404(Book, pk=isbn)
-#     return render(request, "library_app/detail.html", {"book": book})
-
 
 # def results(request, question_id):
 #     response = "You're looking at the results of question %s."

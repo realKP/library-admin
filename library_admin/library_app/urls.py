@@ -7,8 +7,13 @@ urlpatterns = [
     path("", views.index, name="index"),
     # members page
     path("members/", views.MembersView.as_view(), name="members"),
-    # add member
-    # path("members/add_member", views.get_member_info, name="add-member"),
+    # delete member
+    path("members/<int:pk>/", views.DeleteMember.as_view(), name="delete-member"),
+    # edit member page
+    path("members/<int:pk>/edit", views.EditMemberView.as_view(), name="edit-member"),
+
+
+    ##########################################################3
     # ex: /9781594133299
     # path("<str:isbn>/", views.detail, name="detail"),
     # # ex:

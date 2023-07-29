@@ -19,9 +19,7 @@
             </thead>
             <tbody>
                 {% for member in members %}
-                    {% with member_id=member.member_id%}
                     <tr>
-                    {%endwith%}
                         <td>
                             {{ member.member_id }}
                         </td>
@@ -39,32 +37,9 @@
                         </td>
                         <td>
                             <div class="container-fluid">
-                                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#editMemberModal{{ member.member_id}}">
+                                <a class="btn btn-secondary" href="{% url 'library_app:edit-member' pk=member.member_id %}">
                                     Edit
-                                </button>
-                            </div>
-                            <div class="modal" id="editMemberModal{{ member.member_id}}">
-                                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-                                  <div class="modal-content">
-                    
-                                    <!-- Modal Header -->
-                                    <div class="modal-header">
-                                        <h4 class="modal-title">Update Member</h4>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                    </div>
-                                
-                                    <!-- Modal body -->
-                                    <div class="modal-body">
-                                        
-                                    </div>
-                                
-                                    <!-- Modal footer -->
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Update</button>
-                                    </div>
-                                  </div>
-                                </div>
+                                </a>
                             </div>
                         </td>
                         <td>
@@ -93,7 +68,11 @@
                                     <!-- Modal footer -->
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Delete</button>
+                                        <form action="{% url 'library_app:delete-member' pk=member.member_id %}" method="post">
+                                            {% csrf_token %}
+                                            <input type="submit" class="btn btn-danger" value="Delete">
+                                            <input type="hidden" name="_method" value="DELETE" />
+                                        </form>
                                     </div>
                                   </div>
                                 </div>
