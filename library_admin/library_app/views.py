@@ -65,7 +65,7 @@ class EditMemberView(generic.DetailView):
             return super(EditMemberView, self).dispatch(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        # every request (GET or POST) receives blank form for modal
+        # every request receives prefilled form to display
         context = super().get_context_data(**kwargs)
         form = MemberForm({
             "member_first_name": self.object.member_first_name,
@@ -74,13 +74,26 @@ class EditMemberView(generic.DetailView):
             "member_email": self.object.member_email
         })
         context["form"] = form
+        context["saved"] = False
+
+        # alert for successful update
+        if self.request.GET.dict().get("saved", False):
+            context["saved"] = True
         return context
 
     def patch(self, request, *args, **kwargs):
         member = get_object_or_404(Member, pk=kwargs['pk'])
-        print(request.POST.)
-        return HttpResponse('done')
-        # return HttpResponseRedirect(reverse("library_app:members",'something'))
+        payload = request.POST.dict()
+        data_to_be_updated = {
+            "member_first_name": payload["member_first_name"],
+            "member_last_name": payload["member_last_name"],
+            "member_phone": payload["member_phone"],
+            "member_email": payload["member_email"]
+        }
+        for key, value in data_to_be_updated.items():
+            setattr(member, key, value)
+        member.save()
+        return HttpResponseRedirect(reverse("library_app:edit-member", args=[member.member_id]) + '?saved=True')
 
 ##########################################################
 

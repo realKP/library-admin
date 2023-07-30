@@ -6,6 +6,12 @@
         <h1>Edit Member: {{member.member_id}}</h1>
         <p>Here you can edit a member's personal information and rentals</p>
     </div>
+    {% if saved %}
+        <div class="alert alert-success alert-dismissible" role="alert">
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <strong>Updated successfully.</strong> 
+        </div>
+    {% endif %}
     <div class="container-fluid">
         <form action="{% url 'library_app:edit-member' pk=member.member_id %}" method="post">
             {% csrf_token %}
