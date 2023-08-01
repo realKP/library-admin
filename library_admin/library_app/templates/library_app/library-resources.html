@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %} Library Resources {% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <h1>{{library.library_name}}</h1>
+        <p>Library ID: {{library.library_id}}</p>
+        <p>Library Address: {{library.library_address}}</p>
+    </div>
+    <div class="container-fluid">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Resource ID</th>
+                    <th>ISBN</th>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>QTY Available</th>
+                    <th>QTY Checked Out</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for resource in resources %}
+                    <tr>
+                        <td>
+                            {{ resource.resource_id }}
+                        </td>
+                        <td>
+                            {{ resource.isbn }}
+                        </td>
+                        <!-- <td>
+                            {{ book.book_title }}
+                        </td>
+                        <td>
+                            {{ author.author_name }}
+                        </td> -->
+                        <td>
+                            {{ resource.quantity_available }}
+                        </td>
+                        <td>
+                            {{ resource.quantity_checked_out }}
+                        </td>
+                        <td>
+                            <div class="container-fluid">
+                                <a class="btn btn-secondary" href="{% url 'library_app:library-resources' pk=library.library_id %}">
+                                    View
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

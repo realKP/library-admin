@@ -85,7 +85,7 @@ class BookAuthor(models.Model):
         unique_together = (('author', 'isbn'),)
 
     def __str__(self):
-        return (self.author + ', ' + self.isbn)
+        return (str(self.author) + ', ' + str(self.isbn))
 
 
 class Rental(models.Model):

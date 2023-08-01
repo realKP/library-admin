@@ -95,12 +95,24 @@ class EditMemberView(generic.DetailView):
         member.save()
         return HttpResponseRedirect(reverse("library_app:edit-member", args=[member.member_id]) + '?saved=True')
 
-##########################################################
 
-# def results(request, question_id):
-#     response = "You're looking at the results of question %s."
-#     return HttpResponse(response % question_id)
+class LibrariesView(generic.ListView):
+    template_name = "library_app/libraries.html"
+    context_object_name = "libraries"
+    # queries for all libraries
+    queryset = Library.objects.all()
 
 
-# def vote(request, question_id):
-#     return HttpResponse("You're voting on question %s." % question_id)
+class LibraryResourcesView(generic.ListView):
+    template_name = "library_app/library-resources.html"
+    context_object_name = "resources"
+
+    def get_queryset(self):
+        return Resource.objects.filter(library_id=self.kwargs['pk'])
+
+    def get_context_data(self, **kwargs):
+        # every request (GET or POST) receives blank form for modal
+        context = super().get_context_data(**kwargs)
+        library = get_object_or_404(Library, pk=self.kwargs['pk'])
+        context["library"] = library
+        return context

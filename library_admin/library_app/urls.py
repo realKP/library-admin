@@ -11,6 +11,10 @@ urlpatterns = [
     path("members/<int:pk>/", views.DeleteMember.as_view(), name="delete-member"),
     # edit member page
     path("members/<int:pk>/edit", views.EditMemberView.as_view(), name="edit-member"),
+    # libraries page
+    path("libraries/", views.LibrariesView.as_view(), name="libraries"),
+    # view a library's resources page
+    path("libraries/<int:pk>/resources", views.LibraryResourcesView.as_view(), name="library-resources")
 
 
     ##########################################################3
