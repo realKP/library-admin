@@ -11,6 +11,8 @@ urlpatterns = [
     path("members/<int:pk>/", views.DeleteMember.as_view(), name="delete-member"),
     # edit member page
     path("members/<int:pk>/edit", views.EditMemberView.as_view(), name="edit-member"),
+    # rental items page
+    path("rentals/<int:pk>", views.RentalItemsView.as_view(), name="rental-items"),
     # libraries page
     path("libraries/", views.LibrariesView.as_view(), name="libraries"),
     # view a library's resources page

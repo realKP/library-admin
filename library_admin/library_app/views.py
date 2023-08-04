@@ -79,6 +79,12 @@ class EditMemberView(generic.DetailView):
         # alert for successful update
         if self.request.GET.dict().get("saved", False):
             context["saved"] = True
+
+        # member's rental history
+        context["rentals"] = Rental.objects.filter(member_id=kwargs['object'].member_id)
+        resources = Resource.objects.all()
+        for resource in resources:
+            print(type(resource.isbn))
         return context
 
     def patch(self, request, *args, **kwargs):
@@ -96,6 +102,14 @@ class EditMemberView(generic.DetailView):
         return HttpResponseRedirect(reverse("library_app:edit-member", args=[member.member_id]) + '?saved=True')
 
 
+class RentalItemsView(generic.DetailView):
+    template_name = "library_app/rental-items.html"
+    context_object_name = "rental_items"
+
+    def get_queryset(self):
+        return RentalItem.objects.filter(rental_id=self.kwargs['pk'])
+
+
 class LibrariesView(generic.ListView):
     template_name = "library_app/libraries.html"
     context_object_name = "libraries"
@@ -108,10 +122,27 @@ class LibraryResourcesView(generic.ListView):
     context_object_name = "resources"
 
     def get_queryset(self):
-        return Resource.objects.filter(library_id=self.kwargs['pk'])
+        resources = Resource.objects.select_related("isbn").filter(library_id=self.kwargs['pk']).order_by("resource_id")
+        context = []
+        for resource in resources:
+            info = {}
+            info["resource_id"] = resource.resource_id
+            info["isbn"] = resource.isbn.isbn
+            info["book_title"] = resource.isbn.book_title
+            info["quantity_available"] = resource.quantity_available
+            info["quantity_checked_out"] = resource.quantity_checked_out
+            books_authors = BookAuthor.objects.filter(isbn=resource.isbn)
+            authors_list = []
+            for book_author in books_authors:
+                authors = Author.objects.filter(author_id=book_author.author_id)
+                for author in authors:
+                    authors_list.append(author.author_name)
+            info["authors"] = ", ".join(authors_list)
+            context.append(info)
+        return context
 
     def get_context_data(self, **kwargs):
-        # every request (GET or POST) receives blank form for modal
+        # library info to display at top of page
         context = super().get_context_data(**kwargs)
         library = get_object_or_404(Library, pk=self.kwargs['pk'])
         context["library"] = library

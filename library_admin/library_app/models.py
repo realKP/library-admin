@@ -32,7 +32,7 @@ class Book(models.Model):
         db_table = 'books'
 
     def __str__(self):
-        return (self.isbn + ', ' + self.book_title)
+        return (self.isbn)
 
 
 class Library(models.Model):
@@ -53,14 +53,14 @@ class Resource(models.Model):
     isbn = models.ForeignKey(Book, models.PROTECT, db_column='isbn')
     library = models.ForeignKey(Library, models.PROTECT)
     quantity_available = models.IntegerField()
-    quanitity_checked_out = models.IntegerField()
+    quantity_checked_out = models.IntegerField()
 
     class Meta:
         managed = False
         db_table = 'resources'
 
     def __str__(self):
-        return (self.isbn + ', ' + self.library)
+        return (str(self.isbn) + ', ' + str(self.library))
 
 
 class Author(models.Model):
@@ -93,6 +93,7 @@ class Rental(models.Model):
     member = models.ForeignKey(Member, models.PROTECT)
     library = models.ForeignKey(Library, models.PROTECT)
     rental_date = models.DateField()
+    rental_status = models.CharField(max_length=7)
 
     class Meta:
         managed = False

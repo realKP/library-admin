@@ -14,7 +14,7 @@
                     <th>Resource ID</th>
                     <th>ISBN</th>
                     <th>Title</th>
-                    <th>Author</th>
+                    <th>Authors</th>
                     <th>QTY Available</th>
                     <th>QTY Checked Out</th>
                 </tr>
@@ -26,14 +26,14 @@
                             {{ resource.resource_id }}
                         </td>
                         <td>
-                            {{ resource.isbn }}
-                        </td>
-                        <!-- <td>
-                            {{ book.book_title }}
+                            <a href="/">{{ resource.isbn }}</a>
                         </td>
                         <td>
-                            {{ author.author_name }}
-                        </td> -->
+                            {{ resource.book_title }}
+                        </td>
+                        <td>
+                            {{resource.authors}}
+                        </td>
                         <td>
                             {{ resource.quantity_available }}
                         </td>

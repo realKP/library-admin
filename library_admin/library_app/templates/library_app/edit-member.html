@@ -26,15 +26,41 @@
         <table class="table table-striped table-hover">
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Phone</th>
+                    <th>Rental ID</th>
+                    <th>Library</th>
+                    <th>Num of Items</th>
+                    <th>Rental Date</th>
                     <th>Email</th>
                 </tr>
             </thead>
             <tbody>
-                
+                {% for rental in rentals %}
+                    <tr>
+                        <td>
+                            {{ rental.rental_id }}
+                        </td>
+                        <td>
+                            {{ rental.library_id }}
+                        </td>
+                        <td>
+                            
+                        </td>
+                        <td>
+                            {{ rental.rental_date }}
+                        </td>
+                        <td>
+                            {{ resource.quantity_checked_out }}
+                        </td>
+                        <td>
+                            <div class="container-fluid">
+                                <a class="btn btn-secondary" href="{% url 'library_app:rental-items' pk=rental.rental_id %}">
+                                    View
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
             </tbody>
         </table>
+    </div>
 {% endblock %}
