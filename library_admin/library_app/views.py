@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.views import generic, View
 from django.template import RequestContext
 from django.db.models import Count
-from .forms import MemberForm
+from .forms import MemberForm, ResourceForm
 from .models import Member, Library, Book, Author, Resource, Rental, RentalItem, BookAuthor
 
 # Create your views here.
@@ -145,4 +145,52 @@ class RentalItemsView(generic.ListView):
     context_object_name = "rental_items"
 
     def get_queryset(self):
-        return RentalItem.objects.filter(rental_id=self.kwargs['pk']).select_related("resource")
+        return RentalItem.objects.filter(rental_id=self.kwargs['pk']).select_related("resource", "resource__isbn")
+
+
+class ResourcesView(generic.ListView):
+    template_name = "library_app/resources.html"
+    context_object_name = "resources"
+    # queries for all members
+    queryset = Resource.objects.all().select_related("isbn")
+
+    def get_context_data(self, **kwargs):
+        # every request (GET or POST) receives blank form for modal
+        context = super().get_context_data(**kwargs)
+        form = ResourceForm()
+        context["form"] = form
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = MemberForm(request.POST)
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            form.save()
+            # redirect to members page to display new entry
+            return HttpResponseRedirect(reverse("library_app:resources"))
+
+
+class ResourceView(generic.DetailView):
+    model = Resource
+    template_name = "library_app/resource.html"
+    context_object_name = "resource"
+
+    def get_context_data(self, **kwargs):
+        # every request receives prefilled form to display
+        context = super().get_context_data(**kwargs)
+        # form = MemberForm({
+        #     "member_first_name": self.object.member_first_name,
+        #     "member_last_name": self.object.member_last_name,
+        #     "member_phone": self.object.member_phone,
+        #     "member_email": self.object.member_email
+        # })
+        # context["form"] = form
+        # context["saved"] = False
+
+        # # alert for successful update
+        # if self.request.GET.dict().get("saved", False):
+        #     context["saved"] = True
+
+        # member's rental history
+        context["libraries"] = Library.objects.filter(library_id=kwargs['object'].library_id)
+        return context

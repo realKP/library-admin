@@ -18,14 +18,10 @@ urlpatterns = [
     # libraries page
     path("libraries/", views.LibrariesView.as_view(), name="libraries"),
     # view a library's resources page
-    path("libraries/<int:pk>/resources/", views.LibraryResourcesView.as_view(), name="library-resources")
-
-
-    ##########################################################3
-    # ex: /9781594133299
-    # path("<str:isbn>/", views.detail, name="detail"),
-    # # ex:
-    # path("<int:question_id>/results/", views.results, name="results"),
-    # # ex:
-    # path("<int:question_id>/vote/", views.vote, name="vote"),
+    path("libraries/<int:pk>/resources/", views.LibraryResourcesView.as_view(), name="library-resources"),
+    # resources page
+    path("resources/", views.ResourcesView.as_view(), name="resources"),
+    # resources page
+    # path("resources/<int:pk>/", views.ResourceView.as_view(), name="resource"),
+    # 
 ]

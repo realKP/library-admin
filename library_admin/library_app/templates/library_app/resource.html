@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %} View Resource {% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <h1>Resource {{resource.resource_id}}</h1>
+    </div>
+    <div class="container-fluid">
+        <p>
+            First Name: {{ resource.member_first_name }}
+        </p>
+        <p>
+            Last Name: {{ resource.member_last_name }}
+        </p>
+        <p>
+            Phone Number: {{ resource.member_phone }}
+        </p>
+        <p>
+            Email: {{ member.member_email }}
+        </p>
+    </div>
+{% endblock %}

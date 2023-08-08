@@ -10,7 +10,8 @@
             <thead>
                 <tr>
                     <th>Resource ID</th>
-                    <th>Queue Number</th>
+                    <th>Title</th>
+                    <th>Wait List</th>
                     <th>Status</th>
                     <th>Return Date</th>
                 </tr>
@@ -20,6 +21,9 @@
                     <tr>
                         <td>
                             {{ rental_item.resource_id }}
+                        </td>
+                        <td>
+                            {{ rental_item.resource.isbn.book_title }}
                         </td>
                         <td>
                             {{ rental_item.queue_num }}
@@ -32,7 +36,6 @@
                         </td>
                         <td>
                             <div class="container-fluid">
-                                <!-- <a class="btn btn-secondary" href="{% url 'library_app:rental-items' pk=rental.rental_id %}"> -->
                                 <a class="btn btn-secondary" href="/">
                                     Edit
                                 </a>
