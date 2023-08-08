@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.views import generic, View
 from django.template import RequestContext
+from django.db.models import Count
 from .forms import MemberForm
 from .models import Member, Library, Book, Author, Resource, Rental, RentalItem, BookAuthor
 
@@ -51,18 +52,10 @@ class DeleteMember(View):
         return HttpResponseRedirect(reverse("library_app:members"))
 
 
-class EditMemberView(generic.DetailView):
-    http_method_names = ['get', 'patch']
+class MemberView(generic.DetailView):
     model = Member
-    template_name = "library_app/edit-member.html"
+    template_name = "library_app/member.html"
     context_object_name = "member"
-
-    def dispatch(self, *args, **kwargs):
-        method = self.request.POST.get('_method', '').lower()
-        if method == 'patch':
-            return self.patch(*args, **kwargs)
-        else:
-            return super(EditMemberView, self).dispatch(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         # every request receives prefilled form to display
@@ -81,11 +74,19 @@ class EditMemberView(generic.DetailView):
             context["saved"] = True
 
         # member's rental history
-        context["rentals"] = Rental.objects.filter(member_id=kwargs['object'].member_id)
-        resources = Resource.objects.all()
-        for resource in resources:
-            print(type(resource.isbn))
+        context["rentals"] = Rental.objects.filter(member_id=kwargs['object'].member_id).order_by("-rental_date").select_related("library").annotate(Count("rentalitem"))
         return context
+
+
+class EditMember(View):
+    http_method_names = ['patch']
+
+    def dispatch(self, *args, **kwargs):
+        method = self.request.POST.get('_method', '').lower()
+        if method == 'patch':
+            return self.patch(*args, **kwargs)
+        else:
+            return super(EditMember, self).dispatch(*args, **kwargs)
 
     def patch(self, request, *args, **kwargs):
         member = get_object_or_404(Member, pk=kwargs['pk'])
@@ -99,15 +100,7 @@ class EditMemberView(generic.DetailView):
         for key, value in data_to_be_updated.items():
             setattr(member, key, value)
         member.save()
-        return HttpResponseRedirect(reverse("library_app:edit-member", args=[member.member_id]) + '?saved=True')
-
-
-class RentalItemsView(generic.DetailView):
-    template_name = "library_app/rental-items.html"
-    context_object_name = "rental_items"
-
-    def get_queryset(self):
-        return RentalItem.objects.filter(rental_id=self.kwargs['pk'])
+        return HttpResponseRedirect(reverse("library_app:member", args=[member.member_id]) + '?saved=True')
 
 
 class LibrariesView(generic.ListView):
@@ -122,8 +115,8 @@ class LibraryResourcesView(generic.ListView):
     context_object_name = "resources"
 
     def get_queryset(self):
-        resources = Resource.objects.select_related("isbn").filter(library_id=self.kwargs['pk']).order_by("resource_id")
         context = []
+        resources = Resource.objects.filter(library_id=self.kwargs['pk']).order_by("resource_id").select_related("isbn")
         for resource in resources:
             info = {}
             info["resource_id"] = resource.resource_id
@@ -131,12 +124,10 @@ class LibraryResourcesView(generic.ListView):
             info["book_title"] = resource.isbn.book_title
             info["quantity_available"] = resource.quantity_available
             info["quantity_checked_out"] = resource.quantity_checked_out
-            books_authors = BookAuthor.objects.filter(isbn=resource.isbn)
+            books_authors = BookAuthor.objects.filter(isbn=resource.isbn.isbn).select_related("author")
             authors_list = []
             for book_author in books_authors:
-                authors = Author.objects.filter(author_id=book_author.author_id)
-                for author in authors:
-                    authors_list.append(author.author_name)
+                authors_list.append(book_author.author.author_name)
             info["authors"] = ", ".join(authors_list)
             context.append(info)
         return context
@@ -147,3 +138,11 @@ class LibraryResourcesView(generic.ListView):
         library = get_object_or_404(Library, pk=self.kwargs['pk'])
         context["library"] = library
         return context
+
+
+class RentalItemsView(generic.ListView):
+    template_name = "library_app/rental-items.html"
+    context_object_name = "rental_items"
+
+    def get_queryset(self):
+        return RentalItem.objects.filter(rental_id=self.kwargs['pk']).select_related("resource")
