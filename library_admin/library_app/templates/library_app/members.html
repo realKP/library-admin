@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block title %} Members {% endblock %}
 
+{% load crispy_forms_tags %}
 {% block content %}
     <div class="container-fluid">
         <h1>Members</h1>
@@ -25,7 +26,7 @@
                 <!-- Modal body -->
                 <div class="modal-body">
                     {% csrf_token %}
-                    {{ form }}
+                    {{ form|crispy }}
                 </div>
             
                 <!-- Modal footer -->

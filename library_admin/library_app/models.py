@@ -12,7 +12,7 @@ class Member(models.Model):
     member_id = models.AutoField(primary_key=True)
     member_first_name = models.CharField(max_length=255)
     member_last_name = models.CharField(max_length=255)
-    member_phone = models.CharField(max_length=15)
+    member_phone = models.CharField(max_length=10)
     member_email = models.CharField(max_length=255)
 
     class Meta:
@@ -53,7 +53,7 @@ class Resource(models.Model):
     isbn = models.ForeignKey(Book, models.PROTECT, db_column='isbn')
     library = models.ForeignKey(Library, models.PROTECT)
     quantity_available = models.IntegerField()
-    quantity_checked_out = models.IntegerField()
+    quantity_checked_out = models.IntegerField(default=0)
 
     class Meta:
         managed = False

@@ -18,7 +18,7 @@ urlpatterns = [
     # libraries page
     path("libraries/", views.LibrariesView.as_view(), name="libraries"),
     # view a library's resources page
-    path("libraries/<int:pk>/resources/", views.LibraryResourcesView.as_view(), name="library-resources"),
+    path("libraries/<int:pk>/resources/", views.LibraryView.as_view(), name="library"),
     # resources page
     path("resources/", views.ResourcesView.as_view(), name="resources"),
     # resources page

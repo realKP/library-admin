@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block title %} View Member {% endblock %}
 
+{% load crispy_forms_tags %}
 {% block content %}
     <div class="container-fluid">
         <h1>Member {{member.member_id}}</h1>
@@ -43,16 +44,14 @@
                 <!-- Modal body -->
                 <div class="modal-body">
                     {% csrf_token %}
-                    {{ form }}
+                    {{ form|crispy }}
                 </div>
             
                 <!-- Modal footer -->
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <div class="container-fluid">
-                        <input type="submit" class="btn btn-primary" value="Update">
-                        <input type="hidden" name="_method" value="PATCH" />
-                    </div>
+                    <input type="submit" class="btn btn-primary" value="Update">
+                    <input type="hidden" name="_method" value="PATCH" />
                 </div>
             </form>
           </div>

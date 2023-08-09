@@ -7,8 +7,6 @@ from django.db.models import Count
 from .forms import MemberForm, ResourceForm
 from .models import Member, Library, Book, Author, Resource, Rental, RentalItem, BookAuthor
 
-# Create your views here.
-
 
 def index(request):
     return render(request, "library_app/index.html", {})
@@ -92,8 +90,8 @@ class EditMember(View):
         member = get_object_or_404(Member, pk=kwargs['pk'])
         payload = request.POST.dict()
         data_to_be_updated = {
-            "member_first_name": payload["member_first_name"],
-            "member_last_name": payload["member_last_name"],
+            "member_first_name": payload["member_first_name"].title(),
+            "member_last_name": payload["member_last_name"].title(),
             "member_phone": payload["member_phone"],
             "member_email": payload["member_email"]
         }
@@ -110,8 +108,8 @@ class LibrariesView(generic.ListView):
     queryset = Library.objects.all()
 
 
-class LibraryResourcesView(generic.ListView):
-    template_name = "library_app/library-resources.html"
+class LibraryView(generic.ListView):
+    template_name = "library_app/library.html"
     context_object_name = "resources"
 
     def get_queryset(self):
@@ -137,6 +135,8 @@ class LibraryResourcesView(generic.ListView):
         context = super().get_context_data(**kwargs)
         library = get_object_or_404(Library, pk=self.kwargs['pk'])
         context["library"] = library
+
+        context["rentals"] = Rental.objects.filter(library_id=self.kwargs['pk']).order_by("-rental_date").annotate(Count("rentalitem"))
         return context
 
 
