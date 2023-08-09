@@ -23,6 +23,16 @@ class MembersView(generic.ListView):
         context = super().get_context_data(**kwargs)
         form = MemberForm()
         context["form"] = form
+        context["saved"] = False
+
+        # alert for update status
+        status = self.request.GET.dict().get("saved")
+        if status == "Error":
+            context["saved"] = "Error"
+        elif status:
+            context["saved"] = True
+        else:
+            context["saved"] = False
         return context
 
     def post(self, request, *args, **kwargs):
@@ -31,7 +41,9 @@ class MembersView(generic.ListView):
             # process the data in form.cleaned_data as required
             form.save()
             # redirect to members page to display new entry
-            return HttpResponseRedirect(reverse("library_app:members"))
+            return HttpResponseRedirect(reverse("library_app:members") + '?saved=True')
+        else:
+            return render(request, "library_app/members.html", {"members": self.queryset, "form": form, "saved": "Error"})
 
 
 class DeleteMember(View):
@@ -58,18 +70,18 @@ class MemberView(generic.DetailView):
     def get_context_data(self, **kwargs):
         # every request receives prefilled form to display
         context = super().get_context_data(**kwargs)
-        form = MemberForm({
-            "member_first_name": self.object.member_first_name,
-            "member_last_name": self.object.member_last_name,
-            "member_phone": self.object.member_phone,
-            "member_email": self.object.member_email
-        })
+        form = MemberForm(instance=self.object)
         context["form"] = form
         context["saved"] = False
 
-        # alert for successful update
-        if self.request.GET.dict().get("saved", False):
+        # alert for update status
+        status = self.request.GET.dict().get("saved")
+        if status == "Error":
+            context["saved"] = "Error"
+        elif status:
             context["saved"] = True
+        else:
+            context["saved"] = False
 
         # member's rental history
         context["rentals"] = Rental.objects.filter(member_id=kwargs['object'].member_id).order_by("-rental_date").select_related("library").annotate(Count("rentalitem"))
@@ -88,17 +100,12 @@ class EditMember(View):
 
     def patch(self, request, *args, **kwargs):
         member = get_object_or_404(Member, pk=kwargs['pk'])
-        payload = request.POST.dict()
-        data_to_be_updated = {
-            "member_first_name": payload["member_first_name"].title(),
-            "member_last_name": payload["member_last_name"].title(),
-            "member_phone": payload["member_phone"],
-            "member_email": payload["member_email"]
-        }
-        for key, value in data_to_be_updated.items():
-            setattr(member, key, value)
-        member.save()
-        return HttpResponseRedirect(reverse("library_app:member", args=[member.member_id]) + '?saved=True')
+        form = MemberForm(request.POST, instance=member)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse("library_app:member", args=[member.member_id]) + '?saved=True')
+        else:
+            return HttpResponseRedirect(reverse("library_app:member", args=[member.member_id]) + '?saved=Error')
 
 
 class LibrariesView(generic.ListView):
