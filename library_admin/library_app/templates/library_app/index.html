@@ -28,19 +28,11 @@
             </div>
             <div class="row">
                 <div class="col">
-                    <a href="/">
-                        <h2>Books & Authors &rarr;</h2>
+                    <a href="{% url 'library_app:books' %}">
+                        <h2>Books &rarr;</h2>
                         <p>See books and authors.</p>
                     </a>
                 </div>
-                <div class="col">
-                    <a href="/">
-                        <h2>Rentals &rarr;</h2>
-                        <p>See the rentals.</p>
-                    </a>
-                </div>
-            </div>
-            <div class="row">
                 <div class="col">
                     <a href="{% url 'library_app:resources' %}">
                         <h2>Resources &rarr;</h2>

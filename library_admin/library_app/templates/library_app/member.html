@@ -6,20 +6,6 @@
     <div class="container-fluid">
         <h1>Member {{member.member_id}}</h1>
     </div>
-    <div class="container-fluid">
-        <p>
-            First Name: {{ member.member_first_name }}
-        </p>
-        <p>
-            Last Name: {{ member.member_last_name }}
-        </p>
-        <p>
-            Phone Number: {{ member.member_phone }}
-        </p>
-        <p>
-            Email: {{ member.member_email }}
-        </p>
-    </div>
     {% if saved == "Error" %}
         <div class="alert alert-danger alert-dismissible" role="alert">
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -32,35 +18,14 @@
         </div>
     {% endif %}
     <div class="container-fluid">
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editMemberModal">
-            Edit Member Information
-        </button>
-    </div>
-    <div class="modal" id="editMemberModal">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-          <div class="modal-content">
-            <form action="{% url 'library_app:edit-member' pk=member.member_id %}" method="post">
-                <!-- Modal Header -->
-                <div class="modal-header">
-                    <h4 class="modal-title">Add New Member</h4>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-            
-                <!-- Modal body -->
-                <div class="modal-body">
-                    {% csrf_token %}
-                    {{ form|crispy }}
-                </div>
-            
-                <!-- Modal footer -->
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <input type="submit" class="btn btn-primary" value="Update">
-                    <input type="hidden" name="_method" value="PATCH" />
-                </div>
-            </form>
-          </div>
-        </div>
+        <form action="{% url 'library_app:member' pk=member.member_id %}" method="post">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <div class="container-fluid">
+                <input type="submit" class="btn btn-primary" value="Update">
+                <input type="hidden" name="_method" value="PATCH" />
+            </div>
+        </form>
     </div>
     <div class="container-fluid">
         <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteMemberModal">

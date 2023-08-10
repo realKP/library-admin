@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.views import generic, View
 from django.template import RequestContext
 from django.db.models import Count
-from .forms import MemberForm, ResourceForm
+from .forms import MemberForm, ResourceForm, BookForm
 from .models import Member, Library, Book, Author, Resource, Rental, RentalItem, BookAuthor
 
 
@@ -67,6 +67,13 @@ class MemberView(generic.DetailView):
     template_name = "library_app/member.html"
     context_object_name = "member"
 
+    def dispatch(self, *args, **kwargs):
+        method = self.request.POST.get('_method', '').lower()
+        if method == 'patch':
+            return self.patch(*args, **kwargs)
+        else:
+            return super(MemberView, self).dispatch(*args, **kwargs)
+
     def get_context_data(self, **kwargs):
         # every request receives prefilled form to display
         context = super().get_context_data(**kwargs)
@@ -87,6 +94,15 @@ class MemberView(generic.DetailView):
         context["rentals"] = Rental.objects.filter(member_id=kwargs['object'].member_id).order_by("-rental_date").select_related("library").annotate(Count("rentalitem"))
         return context
 
+    def patch(self, request, *args, **kwargs):
+        member = self.get_object()
+        form = MemberForm(request.POST, instance=self.get_object())
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse("library_app:member", args=[member.member_id]) + '?saved=True')
+        else:
+            return render(request, "library_app/member.html", {"member": member, "form": form, "saved": "Error"})
+
 
 class EditMember(View):
     http_method_names = ['patch']
@@ -99,8 +115,8 @@ class EditMember(View):
             return super(EditMember, self).dispatch(*args, **kwargs)
 
     def patch(self, request, *args, **kwargs):
-        member = get_object_or_404(Member, pk=kwargs['pk'])
-        form = MemberForm(request.POST, instance=member)
+        member = self.get_object()
+        form = MemberForm(request.POST, instance=self.get_object())
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(reverse("library_app:member", args=[member.member_id]) + '?saved=True')
@@ -185,19 +201,42 @@ class ResourceView(generic.DetailView):
     def get_context_data(self, **kwargs):
         # every request receives prefilled form to display
         context = super().get_context_data(**kwargs)
-        # form = MemberForm({
-        #     "member_first_name": self.object.member_first_name,
-        #     "member_last_name": self.object.member_last_name,
-        #     "member_phone": self.object.member_phone,
-        #     "member_email": self.object.member_email
-        # })
-        # context["form"] = form
-        # context["saved"] = False
-
-        # # alert for successful update
-        # if self.request.GET.dict().get("saved", False):
-        #     context["saved"] = True
 
         # member's rental history
         context["libraries"] = Library.objects.filter(library_id=kwargs['object'].library_id)
         return context
+
+
+class BooksView(generic.ListView):
+    template_name = "library_app/books.html"
+    context_object_name = "books"
+    # queries for all members
+    queryset = Book.objects.all()
+
+    def get_context_data(self, **kwargs):
+        # every request (GET or POST) receives blank form for modal
+        context = super().get_context_data(**kwargs)
+        form = BookForm()
+        context["form"] = form
+        context["saved"] = False
+
+        # alert for update status
+        status = self.request.GET.dict().get("saved")
+        if status == "Error":
+            context["saved"] = "Error"
+        elif status:
+            context["saved"] = True
+        else:
+            context["saved"] = False
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = BookForm(request.POST)
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            # form.save()
+            print(form)
+            # redirect to members page to display new entry
+            return HttpResponseRedirect(reverse("library_app:books") + '?saved=True')
+        else:
+            return render(request, "library_app/books.html", {"books": self.queryset, "form": form, "saved": "Error"})

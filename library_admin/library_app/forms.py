@@ -1,5 +1,5 @@
 from django import forms
-from library_app.models import Member, Resource
+from library_app.models import Member, Resource, Book, Author
 from crispy_forms.helper import FormHelper
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
@@ -35,4 +35,23 @@ class MemberForm(forms.ModelForm):
 class ResourceForm(forms.ModelForm):
     class Meta:
         model = Resource
-        fields = ["isbn", "library", "quantity_available", "quantity_checked_out"]
+        fields = ["isbn", "library", "quantity_available"]
+
+
+class BookForm(forms.ModelForm):
+    class Meta:
+        model = Book
+        fields = ["isbn", "book_title"]
+        labels = {
+            "isbn": _("ISBN"),
+            "book_title": _("Book Title")
+        }
+        help_texts = {
+            "isbn": _("Only ISBN 13 format is accepted."),
+        }
+        widgets = {
+            "isbn": forms.TextInput(attrs={"class": "form-control", "placeholder": "ISBN", "pattern": "[0-9]{13}"}),
+            "book_title": forms.TextInput(attrs={"class": "form-control", "placeholder": "Book Title", "minlength": 2}),
+        }
+
+    author = forms.TextInput(attrs={"class": "form-control", "placeholder": "Book Title", "minlength": 2})

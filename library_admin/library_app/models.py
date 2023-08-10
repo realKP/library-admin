@@ -13,18 +13,19 @@ class Member(models.Model):
     member_first_name = models.CharField(max_length=255)
     member_last_name = models.CharField(max_length=255)
     member_phone = models.CharField(max_length=10)
-    member_email = models.CharField(max_length=255)
+    member_email = models.EmailField(max_length=255)
 
     class Meta:
         managed = False
         db_table = 'members'
+        unique_together = (('member_first_name', 'member_last_name', 'member_email'),)
 
     def __str__(self):
         return (self.member_first_name + ' ' + self.member_last_name)
 
 
 class Book(models.Model):
-    isbn = models.CharField(primary_key=True, max_length=255)
+    isbn = models.CharField(primary_key=True, max_length=13)
     book_title = models.CharField(unique=True, max_length=255)
 
     class Meta:
@@ -58,6 +59,7 @@ class Resource(models.Model):
     class Meta:
         managed = False
         db_table = 'resources'
+        unique_together = (('isbn', 'library'),)
 
     def __str__(self):
         return (str(self.isbn) + ', ' + str(self.library))
