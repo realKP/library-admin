@@ -14,30 +14,40 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col">
-                    <a href="{% url 'library_app:members' %}">
-                        <h2>Members &rarr;</h2>
-                        <p>See registered members.</p>
-                    </a>
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="card-title">Members &rarr;</h2>
+                            <p class="card-text">Some description</p>
+                            <a href="{% url 'library_app:members' %}" class="stretched-link"></a>
+                        </div>
+                    </div>
                 </div>
                 <div class="col">
-                    <a href="{% url 'library_app:libraries' %}">
-                        <h2>Libraries &rarr;</h2>
-                        <p>See the libraries registered.</p>
-                    </a>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <a href="{% url 'library_app:books' %}">
-                        <h2>Books &rarr;</h2>
-                        <p>See books and authors.</p>
-                    </a>
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="card-title">Libraries &rarr;</h2>
+                            <p class="card-text">Some description</p>
+                            <a href="{% url 'library_app:libraries' %}" class="stretched-link"></a>
+                        </div>
+                    </div>
                 </div>
                 <div class="col">
-                    <a href="{% url 'library_app:resources' %}">
-                        <h2>Resources &rarr;</h2>
-                        <p>See resources.</p>
-                    </a>
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="card-title">Books &rarr;</h2>
+                            <p class="card-text">Some description</p>
+                            <a href="{% url 'library_app:books' %}" class="stretched-link"></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="card-title">Resources &rarr;</h2>
+                            <p class="card-text">Some description</p>
+                            <a href="{% url 'library_app:resources' %}" class="stretched-link"></a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

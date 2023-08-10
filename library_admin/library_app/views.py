@@ -1,8 +1,7 @@
 from django.shortcuts import get_object_or_404, render
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views import generic, View
-from django.template import RequestContext
 from django.db.models import Count
 from .forms import MemberForm, ResourceForm, BookForm
 from .models import Member, Library, Book, Author, Resource, Rental, RentalItem, BookAuthor
@@ -104,26 +103,6 @@ class MemberView(generic.DetailView):
             return render(request, "library_app/member.html", {"member": member, "form": form, "saved": "Error"})
 
 
-class EditMember(View):
-    http_method_names = ['patch']
-
-    def dispatch(self, *args, **kwargs):
-        method = self.request.POST.get('_method', '').lower()
-        if method == 'patch':
-            return self.patch(*args, **kwargs)
-        else:
-            return super(EditMember, self).dispatch(*args, **kwargs)
-
-    def patch(self, request, *args, **kwargs):
-        member = self.get_object()
-        form = MemberForm(request.POST, instance=self.get_object())
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect(reverse("library_app:member", args=[member.member_id]) + '?saved=True')
-        else:
-            return HttpResponseRedirect(reverse("library_app:member", args=[member.member_id]) + '?saved=Error')
-
-
 class LibrariesView(generic.ListView):
     template_name = "library_app/libraries.html"
     context_object_name = "libraries"
@@ -210,8 +189,22 @@ class ResourceView(generic.DetailView):
 class BooksView(generic.ListView):
     template_name = "library_app/books.html"
     context_object_name = "books"
-    # queries for all members
-    queryset = Book.objects.all()
+
+    def get_queryset(self):
+        context = []
+        books = Book.objects.all()
+        for book in books:
+            info = {}
+            info["isbn"] = book.isbn
+            info["book_title"] = book.book_title
+            books_authors = BookAuthor.objects.filter(isbn=book.isbn).select_related("author")
+            authors_list = []
+            for book_author in books_authors:
+                authors_list.append(book_author.author.author_name)
+            info["authors"] = ", ".join(authors_list)
+            context.append(info)
+            info["resources"] = Resource.objects.filter(isbn=book.isbn).select_related("library")
+        return context
 
     def get_context_data(self, **kwargs):
         # every request (GET or POST) receives blank form for modal
@@ -239,4 +232,4 @@ class BooksView(generic.ListView):
             # redirect to members page to display new entry
             return HttpResponseRedirect(reverse("library_app:books") + '?saved=True')
         else:
-            return render(request, "library_app/books.html", {"books": self.queryset, "form": form, "saved": "Error"})
+            return render(request, "library_app/books.html", {"books": self.get_queryset(), "form": form, "saved": "Error"})

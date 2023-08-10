@@ -12,7 +12,7 @@ urlpatterns = [
     # delete member
     path("members/<int:pk>/delete/", views.DeleteMember.as_view(), name="delete-member"),
     # edit member
-    path("members/<int:pk>/edit/", views.EditMember.as_view(), name="edit-member"),
+    # path("members/<int:pk>/edit/", views.EditMember.as_view(), name="edit-member"),
     # rental items page
     path("rentals/<int:pk>/", views.RentalItemsView.as_view(), name="rental-items"),
     # libraries page

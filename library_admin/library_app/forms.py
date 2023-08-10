@@ -54,4 +54,7 @@ class BookForm(forms.ModelForm):
             "book_title": forms.TextInput(attrs={"class": "form-control", "placeholder": "Book Title", "minlength": 2}),
         }
 
-    author = forms.TextInput(attrs={"class": "form-control", "placeholder": "Book Title", "minlength": 2})
+    something = forms.TextInput(attrs={"class": "form-control"})
+
+    def __init__(self, *args, **kwargs):
+        super(BookForm, self).__init__(*args, **kwargs)
