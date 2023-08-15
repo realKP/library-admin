@@ -47,14 +47,12 @@ class BookForm(forms.ModelForm):
             "book_title": _("Book Title")
         }
         help_texts = {
-            "isbn": _("Only ISBN 13 format is accepted."),
+            "isbn": _("Only ISBN-13 format (no dashes) is accepted."),
         }
         widgets = {
             "isbn": forms.TextInput(attrs={"class": "form-control", "placeholder": "ISBN", "pattern": "[0-9]{13}"}),
             "book_title": forms.TextInput(attrs={"class": "form-control", "placeholder": "Book Title", "minlength": 2}),
         }
 
-    something = forms.TextInput(attrs={"class": "form-control"})
-
-    def __init__(self, *args, **kwargs):
-        super(BookForm, self).__init__(*args, **kwargs)
+    def clean_book_title(self):
+        return self.cleaned_data["book_title"].title()

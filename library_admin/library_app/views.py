@@ -5,6 +5,7 @@ from django.views import generic, View
 from django.db.models import Count
 from .forms import MemberForm, ResourceForm, BookForm
 from .models import Member, Library, Book, Author, Resource, Rental, RentalItem, BookAuthor
+from .utility_functions import clean_authors
 
 
 def index(request):
@@ -226,9 +227,18 @@ class BooksView(generic.ListView):
     def post(self, request, *args, **kwargs):
         form = BookForm(request.POST)
         if form.is_valid():
-            # process the data in form.cleaned_data as required
-            # form.save()
-            print(form)
+            # create book
+            form.save()
+            # creates authors and books_authors
+            authors = clean_authors(request.POST["authors"])
+            print(authors)
+            book = get_object_or_404(Book, pk=form.cleaned_data["isbn"])
+            for name in authors:
+                # check if author exists; if not, create author
+                author, created = Author.objects.get_or_create(author_name=name)
+                # create book_author
+                ba = BookAuthor.objects.create(author=author, isbn=book)
+
             # redirect to members page to display new entry
             return HttpResponseRedirect(reverse("library_app:books") + '?saved=True')
         else:
