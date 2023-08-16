@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views import generic, View
 from django.db.models import Count
-from .forms import MemberForm, ResourceForm, BookForm
+from .forms import MemberForm, ResourceForm, LibraryResourceForm, BookForm
 from .models import Member, Library, Book, Author, Resource, Rental, RentalItem, BookAuthor
 from .utility_functions import clean_authors
 
@@ -138,9 +138,32 @@ class LibraryView(generic.ListView):
         context = super().get_context_data(**kwargs)
         library = get_object_or_404(Library, pk=self.kwargs['pk'])
         context["library"] = library
-
         context["rentals"] = Rental.objects.filter(library_id=self.kwargs['pk']).order_by("-rental_date").annotate(Count("rentalitem"))
+
+        form = LibraryResourceForm(initial={'library': self.kwargs['pk']})
+        context["form"] = form
+        # alert for update status
+        context["saved"] = False
+        status = self.request.GET.dict().get("saved")
+        if status == "Error":
+            context["saved"] = "Error"
+        elif status:
+            context["saved"] = True
+        else:
+            context["saved"] = False
         return context
+
+    def post(self, request, *args, **kwargs):
+        form = LibraryResourceForm(request.POST)
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            form.save()
+            # redirect to members page to display new entry
+            return HttpResponseRedirect(reverse("library_app:library", args=[self.kwargs['pk']]) + '?saved=True')
+        else:
+            library = get_object_or_404(Library, pk=self.kwargs['pk'])
+            rentals = Rental.objects.filter(library_id=self.kwargs['pk']).order_by("-rental_date").annotate(Count("rentalitem"))
+            return render(request, "library_app/library.html", {"resources": self.get_queryset(), "form": form, "saved": "Error", "library": library, "rentals": rentals})
 
 
 class RentalItemsView(generic.ListView):
@@ -162,15 +185,27 @@ class ResourcesView(generic.ListView):
         context = super().get_context_data(**kwargs)
         form = ResourceForm()
         context["form"] = form
+        context["saved"] = False
+
+        # alert for update status
+        status = self.request.GET.dict().get("saved")
+        if status == "Error":
+            context["saved"] = "Error"
+        elif status:
+            context["saved"] = True
+        else:
+            context["saved"] = False
         return context
 
     def post(self, request, *args, **kwargs):
-        form = MemberForm(request.POST)
+        form = ResourceForm(request.POST)
         if form.is_valid():
             # process the data in form.cleaned_data as required
             form.save()
             # redirect to members page to display new entry
-            return HttpResponseRedirect(reverse("library_app:resources"))
+            return HttpResponseRedirect(reverse("library_app:resources") + '?saved=True')
+        else:
+            return render(request, "library_app/resources.html", {"resources": self.get_queryset(), "form": form, "saved": "Error"})
 
 
 class ResourceView(generic.DetailView):

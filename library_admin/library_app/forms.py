@@ -36,6 +36,32 @@ class ResourceForm(forms.ModelForm):
     class Meta:
         model = Resource
         fields = ["isbn", "library", "quantity_available"]
+        labels = {
+            "isbn": _("Book Title"),
+            "library": _("Library"),
+            "quantity_available": _("QTY Available")
+        }
+        widgets = {
+            "isbn": forms.Select(attrs={"class": "form-control"}),
+            "library": forms.Select(attrs={"class": "form-control"}),
+            "quantity_available": forms.NumberInput(attrs={"class": "form-control", "min": 1, "max": 100})
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(ResourceForm, self).__init__(*args, **kwargs)
+        books = Book.objects.all()
+        book_choices = [(book.isbn, book.book_title) for book in books]
+        self.fields['isbn'].choices = book_choices
+
+
+class LibraryResourceForm(ResourceForm):
+    class Meta(ResourceForm.Meta):
+        widgets = {
+            "isbn": forms.Select(attrs={"class": "form-control"}),
+            "library": forms.HiddenInput(),
+            "quantity_available": forms.NumberInput(attrs={"class": "form-control", "min": 1, "max": 100})
+        }
+
 
 
 class BookForm(forms.ModelForm):
