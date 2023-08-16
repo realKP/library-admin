@@ -1,5 +1,5 @@
 from django import forms
-from library_app.models import Member, Resource, Book, Author
+from library_app.models import Member, Resource, Book, Rental, Author
 from crispy_forms.helper import FormHelper
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
@@ -63,7 +63,6 @@ class LibraryResourceForm(ResourceForm):
         }
 
 
-
 class BookForm(forms.ModelForm):
     class Meta:
         model = Book
@@ -82,3 +81,37 @@ class BookForm(forms.ModelForm):
 
     def clean_book_title(self):
         return self.cleaned_data["book_title"].title()
+
+
+class RentalForm(forms.ModelForm):
+    class Meta:
+        model = Rental
+        fields = ["member", "library", "rental_date", "rental_status"]
+        # labels = {
+        #     "member": _("Member"),
+        #     "library": _("Library"),
+        #     # "rental_date": _("Phone Number"),
+        #     "rental_status": _("Email")
+        # }
+        # help_texts = {
+        #     "member_phone": _("No dashes, spaces, or parantheses. Example: 2344567890"),
+        # }
+        # widgets = {
+        #     "member_first_name": forms.TextInput(attrs={"class": "form-control", "placeholder": "First Name", "minlength": 2}),
+        #     "member_last_name": forms.TextInput(attrs={"class": "form-control", "placeholder": "Last Name", "minlength": 2}),
+        #     "member_phone": forms.TextInput(attrs={"class": "form-control", "placeholder": "Phone", "pattern": "[0-9]{10}", "type": "tel"}),
+        #     "member_email": forms.EmailInput(attrs={"class": "form-control", "placeholder": "Email"})
+        # }
+
+    # def clean_member_first_name(self):
+    #     return self.cleaned_data["member_first_name"].title()
+
+    # def clean_member_last_name(self):
+    #     return self.cleaned_data["member_last_name"].title()
+
+
+class LibraryRentalForm(RentalForm):
+    class Meta(ResourceForm.Meta):
+        widgets = {
+            "library": forms.HiddenInput(),
+        }

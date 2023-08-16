@@ -118,7 +118,11 @@
                                                             {{ resource.quantity_available }}
                                                         </td>
                                                         <td>
-                                                            Button
+                                                            <div class="container-fluid">
+                                                                <a class="btn btn-secondary" href="{% url 'library_app:library' pk=resource.library.library_id %}">
+                                                                    View Library
+                                                                </a>
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                 {% endfor %}

@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views import generic, View
 from django.db.models import Count
-from .forms import MemberForm, ResourceForm, LibraryResourceForm, BookForm
+from .forms import MemberForm, ResourceForm, LibraryResourceForm, BookForm, LibraryRentalForm
 from .models import Member, Library, Book, Author, Resource, Rental, RentalItem, BookAuthor
 from .utility_functions import clean_authors
 
@@ -140,8 +140,12 @@ class LibraryView(generic.ListView):
         context["library"] = library
         context["rentals"] = Rental.objects.filter(library_id=self.kwargs['pk']).order_by("-rental_date").annotate(Count("rentalitem"))
 
-        form = LibraryResourceForm(initial={'library': self.kwargs['pk']})
-        context["form"] = form
+        # forms info
+        resource_form = LibraryResourceForm(initial={'library': self.kwargs['pk']})
+        context["resource_form"] = resource_form
+        rental_form = LibraryRentalForm(initial={'library': self.kwargs['pk']})
+        context["rental_form"] = rental_form
+
         # alert for update status
         context["saved"] = False
         status = self.request.GET.dict().get("saved")
@@ -154,16 +158,28 @@ class LibraryView(generic.ListView):
         return context
 
     def post(self, request, *args, **kwargs):
-        form = LibraryResourceForm(request.POST)
-        if form.is_valid():
-            # process the data in form.cleaned_data as required
-            form.save()
-            # redirect to members page to display new entry
-            return HttpResponseRedirect(reverse("library_app:library", args=[self.kwargs['pk']]) + '?saved=True')
+        if None:
+            resource_form = LibraryResourceForm(request.POST)
+            if resource_form.is_valid():
+                # process the data in form.cleaned_data as required
+                resource_form.save()
+                # redirect to members page to display new entry
+                return HttpResponseRedirect(reverse("library_app:library", args=[self.kwargs['pk']]) + '?saved=True')
+            else:
+                library = get_object_or_404(Library, pk=self.kwargs['pk'])
+                rentals = Rental.objects.filter(library_id=self.kwargs['pk']).order_by("-rental_date").annotate(Count("rentalitem"))
+                return render(request, "library_app/library.html", {"resources": self.get_queryset(), "resource_form": resource_form, "saved": "Error", "library": library, "rentals": rentals})
         else:
-            library = get_object_or_404(Library, pk=self.kwargs['pk'])
-            rentals = Rental.objects.filter(library_id=self.kwargs['pk']).order_by("-rental_date").annotate(Count("rentalitem"))
-            return render(request, "library_app/library.html", {"resources": self.get_queryset(), "form": form, "saved": "Error", "library": library, "rentals": rentals})
+            rental_form = LibraryRentalForm(request.POST)
+            if rental_form.is_valid():
+                # process the data in form.cleaned_data as required
+                rental_form.save()
+                # redirect to members page to display new entry
+                return HttpResponseRedirect(reverse("library_app:library", args=[self.kwargs['pk']]) + '?saved=True')
+            else:
+                library = get_object_or_404(Library, pk=self.kwargs['pk'])
+                rentals = Rental.objects.filter(library_id=self.kwargs['pk']).order_by("-rental_date").annotate(Count("rentalitem"))
+                return render(request, "library_app/library.html", {"resources": self.get_queryset(), "rental_form": rental_form, "saved": "Error", "library": library, "rentals": rentals})
 
 
 class RentalItemsView(generic.ListView):

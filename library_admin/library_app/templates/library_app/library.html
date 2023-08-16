@@ -40,13 +40,43 @@
                 <!-- Modal body -->
                 <div class="modal-body">
                     {% csrf_token %}
-                    {{ form|crispy }}
+                    {{ resource_form|crispy }}
                 </div>
             
                 <!-- Modal footer -->
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <input type="submit" class="btn btn-primary" value="Add">
+                </div>
+            </form>
+          </div>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRentalModal">
+            Create Rental
+        </button>
+    </div>
+    <div class="modal" id="addRentalModal">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+          <div class="modal-content">
+            <form action="{% url 'library_app:library' library.library_id %}" method="post">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Create Rental</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+            
+                <!-- Modal body -->
+                <div class="modal-body">
+                    {% csrf_token %}
+                    {{ resource_form|crispy }}
+                </div>
+            
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <input type="submit" class="btn btn-primary" value="Create">
                 </div>
             </form>
           </div>
