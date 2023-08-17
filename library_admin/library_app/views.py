@@ -6,6 +6,7 @@ from django.db.models import Count
 from .forms import MemberForm, ResourceForm, LibraryResourceForm, BookForm, LibraryRentalForm
 from .models import Member, Library, Book, Author, Resource, Rental, RentalItem, BookAuthor
 from .utility_functions import clean_authors
+from datetime import date, timedelta
 
 
 def index(request):
@@ -143,7 +144,7 @@ class LibraryView(generic.ListView):
         # forms info
         resource_form = LibraryResourceForm(initial={'library': self.kwargs['pk']})
         context["resource_form"] = resource_form
-        rental_form = LibraryRentalForm(initial={'library': self.kwargs['pk']})
+        rental_form = LibraryRentalForm(info=self.get_queryset(), initial={'library': self.kwargs['pk'], 'rental_date': date.today(), 'rental_status': 'OPEN'})
         context["rental_form"] = rental_form
 
         # alert for update status
@@ -158,28 +159,51 @@ class LibraryView(generic.ListView):
         return context
 
     def post(self, request, *args, **kwargs):
-        if None:
-            resource_form = LibraryResourceForm(request.POST)
-            if resource_form.is_valid():
-                # process the data in form.cleaned_data as required
-                resource_form.save()
-                # redirect to members page to display new entry
-                return HttpResponseRedirect(reverse("library_app:library", args=[self.kwargs['pk']]) + '?saved=True')
-            else:
-                library = get_object_or_404(Library, pk=self.kwargs['pk'])
-                rentals = Rental.objects.filter(library_id=self.kwargs['pk']).order_by("-rental_date").annotate(Count("rentalitem"))
-                return render(request, "library_app/library.html", {"resources": self.get_queryset(), "resource_form": resource_form, "saved": "Error", "library": library, "rentals": rentals})
+        resource_form = LibraryResourceForm(request.POST)
+        if resource_form.is_valid():
+            # process the data in form.cleaned_data as required
+            resource_form.save()
+            # redirect to members page to display new entry
+            return HttpResponseRedirect(reverse("library_app:library", args=[self.kwargs['pk']]) + '?saved=True')
         else:
-            rental_form = LibraryRentalForm(request.POST)
-            if rental_form.is_valid():
-                # process the data in form.cleaned_data as required
-                rental_form.save()
-                # redirect to members page to display new entry
-                return HttpResponseRedirect(reverse("library_app:library", args=[self.kwargs['pk']]) + '?saved=True')
-            else:
-                library = get_object_or_404(Library, pk=self.kwargs['pk'])
-                rentals = Rental.objects.filter(library_id=self.kwargs['pk']).order_by("-rental_date").annotate(Count("rentalitem"))
-                return render(request, "library_app/library.html", {"resources": self.get_queryset(), "rental_form": rental_form, "saved": "Error", "library": library, "rentals": rentals})
+            rental_form = LibraryRentalForm(info=self.get_queryset(), initial={'library': self.kwargs['pk'], 'rental_date': date.today(), 'rental_status': 'OPEN'})
+            library = get_object_or_404(Library, pk=self.kwargs['pk'])
+            rentals = Rental.objects.filter(library_id=self.kwargs['pk']).order_by("-rental_date").annotate(Count("rentalitem"))
+            return render(request, "library_app/library.html", {"resources": self.get_queryset(), "resource_form": resource_form, "rental_form": rental_form, "saved": "Error", "library": library, "rentals": rentals})
+
+
+class AddLibraryRental(View):
+    http_method_names = ['post']
+
+    def post(self, request, *args, **kwargs):
+        resources = Resource.objects.filter(library_id=self.kwargs['pk']).order_by("resource_id").select_related("isbn")
+        rental_form = LibraryRentalForm(request.POST, info=resources)
+        if rental_form.is_valid():
+            # create rental
+            new_rental = rental_form.save(commit=False)
+            # creates rental items
+            isbns = request.POST.getlist('resources')
+            for isbn in isbns:
+                status = "CHECKED OUT"
+                pos = 0
+                rental_item = RentalItem(
+                    rental=new_rental.pk,
+                    resource=get_object_or_404(Resource, isbn=isbn, library=rental_form.cleaned_data['library']),
+                    queue_num=pos,
+                    rental_item_status=status,
+                    return_date=date.today() + timedelta(days=14)
+                )
+                print(rental_item)
+                # rental_item.save()
+            # ba = BookAuthor.objects.create(author=author, isbn=book)
+
+            # redirect to library page to display new entry
+            return HttpResponseRedirect(reverse("library_app:library", args=[self.kwargs['pk']]) + '?saved=True')
+        else:
+            resource_form = LibraryResourceForm(initial={'library': self.kwargs['pk']})
+            library = get_object_or_404(Library, pk=self.kwargs['pk'])
+            rentals = Rental.objects.filter(library_id=self.kwargs['pk']).order_by("-rental_date").annotate(Count("rentalitem"))
+            return render(request, "library_app/library.html", {"resources": resources, "rental_form": rental_form, "resource_form": resource_form, "saved": "Error", "library": library, "rentals": rentals})
 
 
 class RentalItemsView(generic.ListView):

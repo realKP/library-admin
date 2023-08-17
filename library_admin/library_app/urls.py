@@ -17,6 +17,8 @@ urlpatterns = [
     path("libraries/", views.LibrariesView.as_view(), name="libraries"),
     # view a library's resources page
     path("libraries/<int:pk>/", views.LibraryView.as_view(), name="library"),
+    # view a library's resources page
+    path("libraries/<int:pk>/rental", views.AddLibraryRental.as_view(), name="library-rental"),
     # resources page
     path("resources/", views.ResourcesView.as_view(), name="resources"),
     # resources page

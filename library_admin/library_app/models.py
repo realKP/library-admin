@@ -7,6 +7,9 @@
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
 
+RENTAL_STATUS_CHOICES = [("OPEN", "OPEN"), ("CLOSED", "CLOSED"), ("OVERDUE", "OVERDUE")]
+RENTAL_ITEM_STATUS_CHOICES = [("CHECKED OUT", "CHECKED OUT"), ("RESERVED", "RESERVED"), ("OVERDUE", "OVERDUE"), ("RETURNED", "RETURNED")]
+
 
 class Member(models.Model):
     member_id = models.AutoField(primary_key=True)
@@ -78,7 +81,7 @@ class Author(models.Model):
 
 
 class BookAuthor(models.Model):
-    author = models.OneToOneField(Author, models.CASCADE, primary_key=True)  # The composite primary key (author_id, isbn) found, that is not supported. The first column is selected.
+    author = models.OneToOneField(Author, models.CASCADE, primary_key=True)
     isbn = models.ForeignKey(Book, models.CASCADE, db_column='isbn')
 
     class Meta:
@@ -95,7 +98,7 @@ class Rental(models.Model):
     member = models.ForeignKey(Member, models.PROTECT)
     library = models.ForeignKey(Library, models.PROTECT)
     rental_date = models.DateField()
-    rental_status = models.CharField(max_length=7)
+    rental_status = models.CharField(max_length=7, choices=RENTAL_STATUS_CHOICES)
 
     class Meta:
         managed = False
@@ -103,10 +106,10 @@ class Rental(models.Model):
 
 
 class RentalItem(models.Model):
-    rental = models.OneToOneField(Rental, models.CASCADE, primary_key=True)  # The composite primary key (rental_id, resource_id) found, that is not supported. The first column is selected.
+    rental = models.OneToOneField(Rental, models.CASCADE, primary_key=True)
     resource = models.ForeignKey(Resource, models.CASCADE)
     queue_num = models.IntegerField()
-    rental_item_status = models.CharField(max_length=255)
+    rental_item_status = models.CharField(max_length=11, choices=RENTAL_ITEM_STATUS_CHOICES)
     return_date = models.DateField(blank=True, null=True)
 
     class Meta:
