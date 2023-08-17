@@ -1,8 +1,6 @@
 from django import forms
 from library_app.models import Member, Resource, Book, Rental
-from crispy_forms.helper import FormHelper
 from django.utils.translation import gettext_lazy as _
-from django.core.exceptions import ValidationError
 from datetime import date
 
 
@@ -53,6 +51,22 @@ class ResourceForm(forms.ModelForm):
         books = Book.objects.all()
         book_choices = [(book.isbn, book.book_title) for book in books]
         self.fields['isbn'].choices = book_choices
+
+
+class EditResourceForm(ResourceForm):
+    def __init__(self, *args, **kwargs):
+        super(ResourceForm, self).__init__(*args, **kwargs)
+
+    class Meta(ResourceForm.Meta):
+        fields = ["quantity_available", "queue_num"]
+        labels = {
+            "quantity_available": _("QTY Available"),
+            "queue_num": _("Waitlist")
+        }
+        widgets = {
+            "quantity_available": forms.NumberInput(attrs={"class": "form-control", "min": 0, "max": 100}),
+            "queue_num": forms.NumberInput(attrs={"class": "form-control", "min": 0, "max": 100})
+        }
 
 
 class LibraryResourceForm(ResourceForm):

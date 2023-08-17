@@ -58,6 +58,7 @@ class Resource(models.Model):
     library = models.ForeignKey(Library, models.PROTECT)
     quantity_available = models.IntegerField()
     quantity_checked_out = models.IntegerField(default=0)
+    queue_num = models.IntegerField(default=0)
 
     class Meta:
         managed = False
@@ -108,7 +109,6 @@ class Rental(models.Model):
 class RentalItem(models.Model):
     rental = models.OneToOneField(Rental, models.CASCADE, primary_key=True)
     resource = models.ForeignKey(Resource, models.CASCADE)
-    queue_num = models.IntegerField()
     rental_item_status = models.CharField(max_length=11, choices=RENTAL_ITEM_STATUS_CHOICES)
     return_date = models.DateField(blank=True, null=True)
 

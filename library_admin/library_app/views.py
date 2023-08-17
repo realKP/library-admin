@@ -2,8 +2,8 @@ from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views import generic, View
-from django.db.models import Count
-from .forms import MemberForm, ResourceForm, LibraryResourceForm, BookForm, LibraryRentalForm
+from django.db.models import Count, F
+from .forms import MemberForm, ResourceForm, EditResourceForm, LibraryResourceForm, BookForm, LibraryRentalForm
 from .models import Member, Library, Book, Author, Resource, Rental, RentalItem, BookAuthor
 from .utility_functions import clean_authors
 from datetime import date, timedelta
@@ -126,6 +126,7 @@ class LibraryView(generic.ListView):
             info["book_title"] = resource.isbn.book_title
             info["quantity_available"] = resource.quantity_available
             info["quantity_checked_out"] = resource.quantity_checked_out
+            info["queue_num"] = resource.queue_num
             books_authors = BookAuthor.objects.filter(isbn=resource.isbn.isbn).select_related("author")
             authors_list = []
             for book_author in books_authors:
@@ -184,17 +185,25 @@ class AddLibraryRental(View):
             # creates rental items
             isbns = request.POST.getlist('resources')
             for isbn in isbns:
-                status = "CHECKED OUT"
-                pos = 0
+                resource = get_object_or_404(Resource, isbn=isbn, library=rental_form.cleaned_data['library'])
+                return_date = date.today() + timedelta(days=14)
+                # resource available
+                if resource.quantity_available > 0:
+                    resource.quantity_available = F("quantity_available") - 1
+                    resource.quantity_checked_out = F("quantity_checked_out") + 1
+                    status = "CHECKED OUT"
+                # resource unavailable, add to waitlist (queue)
+                else:
+                    status = "RESERVED"
+                    resource.queue_num = F("queue_num") + 1
+
                 rental_item = RentalItem(
                     rental=new_rental.pk,
-                    resource=get_object_or_404(Resource, isbn=isbn, library=rental_form.cleaned_data['library']),
-                    queue_num=pos,
+                    resource=resource,
                     rental_item_status=status,
-                    return_date=date.today() + timedelta(days=14)
+                    return_date=return_date
                 )
-                print(rental_item)
-                # rental_item.save()
+                rental_item.save()
             # ba = BookAuthor.objects.create(author=author, isbn=book)
 
             # redirect to library page to display new entry
@@ -253,13 +262,39 @@ class ResourceView(generic.DetailView):
     template_name = "library_app/resource.html"
     context_object_name = "resource"
 
+    def dispatch(self, *args, **kwargs):
+        method = self.request.POST.get('_method', '').lower()
+        if method == 'patch':
+            return self.patch(*args, **kwargs)
+        else:
+            return super(ResourceView, self).dispatch(*args, **kwargs)
+
     def get_context_data(self, **kwargs):
         # every request receives prefilled form to display
         context = super().get_context_data(**kwargs)
+        form = EditResourceForm(instance=self.object)
+        context["form"] = form
+        context["saved"] = False
 
-        # member's rental history
-        context["libraries"] = Library.objects.filter(library_id=kwargs['object'].library_id)
+        # alert for update status
+        status = self.request.GET.dict().get("saved")
+        if status == "Error":
+            context["saved"] = "Error"
+        elif status:
+            context["saved"] = True
+        else:
+            context["saved"] = False
+
         return context
+
+    def patch(self, request, *args, **kwargs):
+        resource = self.get_object()
+        form = EditResourceForm(request.POST, instance=self.get_object())
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse("library_app:resource", args=[resource.resource_id]) + '?saved=True')
+        else:
+            return render(request, "library_app/resource.html", {"resource": resource, "form": form, "saved": "Error"})
 
 
 class BooksView(generic.ListView):

@@ -62,6 +62,7 @@
                     <th>Authors</th>
                     <th>QTY Available</th>
                     <th>QTY Checked Out</th>
+                    <th>Waitlist</th>
                 </tr>
             </thead>
             <tbody>
@@ -71,7 +72,7 @@
                             {{ resource.resource_id }}
                         </td>
                         <td>
-                            <a href="/">{{ resource.isbn }}</a>
+                            {{ resource.isbn }}
                         </td>
                         <td>
                             {{ resource.book_title }}
@@ -86,9 +87,12 @@
                             {{ resource.quantity_checked_out }}
                         </td>
                         <td>
+                            {{ resource.queue_num }}
+                        </td>
+                        <td>
                             <div class="container-fluid">
-                                <a class="btn btn-secondary" href="{% url 'library_app:library' pk=library.library_id %}">
-                                    View
+                                <a class="btn btn-secondary" href="{% url 'library_app:resource' pk=resource.resource_id %}">
+                                    Edit
                                 </a>
                             </div>
                         </td>
