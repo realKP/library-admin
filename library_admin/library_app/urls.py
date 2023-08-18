@@ -13,6 +13,8 @@ urlpatterns = [
     path("members/<int:pk>/delete/", views.DeleteMember.as_view(), name="delete-member"),
     # rental items page
     path("rentals/<int:pk>/", views.RentalItemsView.as_view(), name="rental-items"),
+    # rental item page
+    path("rentals/<int:rental>/resources/<int:resource>/", views.RentalItemView.as_view(), name="rental-item"),
     # libraries page
     path("libraries/", views.LibrariesView.as_view(), name="libraries"),
     # view a library's resources page
@@ -21,7 +23,7 @@ urlpatterns = [
     path("libraries/<int:pk>/rental", views.AddLibraryRental.as_view(), name="library-rental"),
     # resources page
     path("resources/", views.ResourcesView.as_view(), name="resources"),
-    # resources page
+    # resource page
     path("resources/<int:pk>/", views.ResourceView.as_view(), name="resource"),
     # books page
     path("books/", views.BooksView.as_view(), name="books"),

@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views import generic, View
 from django.db.models import Count, F
-from .forms import MemberForm, ResourceForm, EditResourceForm, LibraryResourceForm, BookForm, LibraryRentalForm
+from .forms import MemberForm, ResourceForm, EditResourceForm, LibraryResourceForm, BookForm, LibraryRentalForm, RentalItemForm
 from .models import Member, Library, Book, Author, Resource, Rental, RentalItem, BookAuthor
 from .utility_functions import clean_authors
 from datetime import date, timedelta
@@ -97,7 +97,7 @@ class MemberView(generic.DetailView):
 
     def patch(self, request, *args, **kwargs):
         member = self.get_object()
-        form = MemberForm(request.POST, instance=self.get_object())
+        form = MemberForm(request.POST, instance=member)
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(reverse("library_app:member", args=[member.member_id]) + '?saved=True')
@@ -140,7 +140,7 @@ class LibraryView(generic.ListView):
         context = super().get_context_data(**kwargs)
         library = get_object_or_404(Library, pk=self.kwargs['pk'])
         context["library"] = library
-        context["rentals"] = Rental.objects.filter(library_id=self.kwargs['pk']).order_by("-rental_date").annotate(Count("rentalitem"))
+        context["rentals"] = Rental.objects.filter(library_id=self.kwargs['pk']).order_by("-rental_date").annotate(Count("rentalitem")).select_related("member")
 
         # forms info
         resource_form = LibraryResourceForm(initial={'library': self.kwargs['pk']})
@@ -181,30 +181,35 @@ class AddLibraryRental(View):
         rental_form = LibraryRentalForm(request.POST, info=resources)
         if rental_form.is_valid():
             # create rental
-            new_rental = rental_form.save(commit=False)
+            new_rental = rental_form.save()
             # creates rental items
             isbns = request.POST.getlist('resources')
             for isbn in isbns:
                 resource = get_object_or_404(Resource, isbn=isbn, library=rental_form.cleaned_data['library'])
-                return_date = date.today() + timedelta(days=14)
                 # resource available
                 if resource.quantity_available > 0:
                     resource.quantity_available = F("quantity_available") - 1
                     resource.quantity_checked_out = F("quantity_checked_out") + 1
+                    resource.save()
                     status = "CHECKED OUT"
+                    return_date = date.today() + timedelta(days=14)
+                    queue_pos = 0
                 # resource unavailable, add to waitlist (queue)
                 else:
                     status = "RESERVED"
+                    queue_pos = resource.queue_num + 1
                     resource.queue_num = F("queue_num") + 1
+                    resource.save()
+                    return_date = None
 
                 rental_item = RentalItem(
-                    rental=new_rental.pk,
+                    rental=new_rental,
                     resource=resource,
                     rental_item_status=status,
-                    return_date=return_date
+                    return_date=return_date,
+                    queue_pos=queue_pos
                 )
                 rental_item.save()
-            # ba = BookAuthor.objects.create(author=author, isbn=book)
 
             # redirect to library page to display new entry
             return HttpResponseRedirect(reverse("library_app:library", args=[self.kwargs['pk']]) + '?saved=True')
@@ -220,7 +225,57 @@ class RentalItemsView(generic.ListView):
     context_object_name = "rental_items"
 
     def get_queryset(self):
-        return RentalItem.objects.filter(rental_id=self.kwargs['pk']).select_related("resource", "resource__isbn")
+        return RentalItem.objects.filter(rental_id=self.kwargs['pk']).select_related("rental", "rental__member", "resource", "resource__isbn")
+
+    def get_context_data(self, **kwargs):
+        # every request (GET or POST) receives blank form for modal
+        context = super().get_context_data(**kwargs)
+        context["rental"] = self.get_queryset()[0].rental
+        return context
+
+
+class RentalItemView(generic.ListView):
+    model = RentalItem
+    template_name = "library_app/rental-item.html"
+    context_object_name = "rental_item"
+
+    def dispatch(self, *args, **kwargs):
+        method = self.request.POST.get('_method', '').lower()
+        if method == 'patch':
+            return self.patch(*args, **kwargs)
+        else:
+            return super(RentalItemView, self).dispatch(*args, **kwargs)
+
+    def get_queryset(self):
+        rental_item = RentalItem.objects.filter(rental_id=self.kwargs['rental'], resource_id=self.kwargs['resource']).select_related("rental", "resource", "resource__isbn")
+        return rental_item[0]
+
+    def get_context_data(self, **kwargs):
+        # every request receives prefilled form to display
+        context = super().get_context_data(**kwargs)
+        form = RentalItemForm(instance=self.get_queryset())
+        context["form"] = form
+        context["saved"] = False
+
+        # alert for update status
+        status = self.request.GET.dict().get("saved")
+        if status == "Error":
+            context["saved"] = "Error"
+        elif status:
+            context["saved"] = True
+        else:
+            context["saved"] = False
+        return context
+
+    def patch(self, request, *args, **kwargs):
+        rental_item = self.get_queryset()
+        form = RentalItemForm(request.POST, instance=rental_item)
+        if form.is_valid():
+            print(form.cleaned_data)
+            form.save()
+            return HttpResponseRedirect(reverse("library_app:rental-item", args=[self.kwargs['rental'], self.kwargs['resource']]) + '?saved=True')
+        else:
+            return render(request, "library_app/rental-item.html", {"rental_item": rental_item, "form": form, "saved": "Error"})
 
 
 class ResourcesView(generic.ListView):
@@ -289,7 +344,7 @@ class ResourceView(generic.DetailView):
 
     def patch(self, request, *args, **kwargs):
         resource = self.get_object()
-        form = EditResourceForm(request.POST, instance=self.get_object())
+        form = EditResourceForm(request.POST, instance=resource)
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(reverse("library_app:resource", args=[resource.resource_id]) + '?saved=True')

@@ -111,6 +111,7 @@ class RentalItem(models.Model):
     resource = models.ForeignKey(Resource, models.CASCADE)
     rental_item_status = models.CharField(max_length=11, choices=RENTAL_ITEM_STATUS_CHOICES)
     return_date = models.DateField(blank=True, null=True)
+    queue_pos = models.IntegerField(default=0)
 
     class Meta:
         managed = False

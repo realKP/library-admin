@@ -139,6 +139,7 @@
             <thead>
                 <tr>
                     <th>Rental ID</th>
+                    <th>Member</th>
                     <th>Num of Items</th>
                     <th>Rental Date</th>
                     <th>Rental Status</th>
@@ -149,6 +150,9 @@
                     <tr>
                         <td>
                             {{ rental.rental_id }}
+                        </td>
+                        <td>
+                            {{ rental.member.member_first_name }} {{ rental.member.member_last_name }} | ID: {{ rental.member.member_id }}
                         </td>
                         <td>
                             {{ rental.rentalitem__count }}

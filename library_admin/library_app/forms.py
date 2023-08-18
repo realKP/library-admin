@@ -1,5 +1,5 @@
 from django import forms
-from library_app.models import Member, Resource, Book, Rental
+from library_app.models import Member, Resource, Book, Rental, RentalItem
 from django.utils.translation import gettext_lazy as _
 from datetime import date
 
@@ -135,4 +135,16 @@ class LibraryRentalForm(RentalForm):
             "library": forms.HiddenInput(attrs={"class": "form-control"}),
             "rental_date": forms.DateInput(attrs={"class": "form-control", "type": "date", "max": date.today(), "min": "2023-01-01"}),
             "rental_status": forms.HiddenInput(attrs={"class": "form-control", "maxlength": 7})
+        }
+
+
+class RentalItemForm(forms.ModelForm):
+    class Meta:
+        model = RentalItem
+        fields = ["rental_item_status"]
+        labels = {
+            "rental_item_status": _("Rental Item Status")
+        }
+        widgets = {
+            "rental_item_status": forms.Select(attrs={"class": "form-control"})
         }
