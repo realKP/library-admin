@@ -107,7 +107,8 @@ class Rental(models.Model):
 
 
 class RentalItem(models.Model):
-    rental = models.OneToOneField(Rental, models.CASCADE, primary_key=True)
+    rental_item_id = models.CharField(primary_key=True, max_length=255)
+    rental = models.ForeignKey(Rental, models.CASCADE)
     resource = models.ForeignKey(Resource, models.CASCADE)
     rental_item_status = models.CharField(max_length=11, choices=RENTAL_ITEM_STATUS_CHOICES)
     return_date = models.DateField(blank=True, null=True)
@@ -116,7 +117,6 @@ class RentalItem(models.Model):
     class Meta:
         managed = False
         db_table = 'rental_items'
-        unique_together = (('rental', 'resource'),)
 
     def __str__(self):
         return (str(self.resource) + ', ' + self.rental_item_status)

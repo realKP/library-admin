@@ -271,7 +271,6 @@ class RentalItemView(generic.ListView):
         rental_item = self.get_queryset()
         form = RentalItemForm(request.POST, instance=rental_item)
         if form.is_valid():
-            print(form.cleaned_data)
             form.save()
             return HttpResponseRedirect(reverse("library_app:rental-item", args=[self.kwargs['rental'], self.kwargs['resource']]) + '?saved=True')
         else:
