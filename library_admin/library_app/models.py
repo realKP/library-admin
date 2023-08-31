@@ -1,14 +1,17 @@
-# This is an auto-generated Django model module.
-# You'll have to do the following manually to clean this up:
-#   * Rearrange models' order
-#   * Make sure each model has one field with primary_key=True
-#   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
-#   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
-# Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
 
-RENTAL_STATUS_CHOICES = [("OPEN", "OPEN"), ("CLOSED", "CLOSED"), ("OVERDUE", "OVERDUE")]
-RENTAL_ITEM_STATUS_CHOICES = [("CHECKED OUT", "CHECKED OUT"), ("RESERVED", "RESERVED"), ("OVERDUE", "OVERDUE"), ("RETURNED", "RETURNED")]
+RENTAL_STATUS_CHOICES = [
+    ("OPEN", "OPEN"),
+    ("CLOSED", "CLOSED"),
+    ("OVERDUE", "OVERDUE")
+]
+
+RENTAL_ITEM_STATUS_CHOICES = [
+    ("CHECKED OUT", "CHECKED OUT"),
+    ("RESERVED", "RESERVED"),
+    ("OVERDUE", "OVERDUE"),
+    ("RETURNED", "RETURNED")
+]
 
 
 class Member(models.Model):
@@ -21,7 +24,11 @@ class Member(models.Model):
     class Meta:
         managed = False
         db_table = 'members'
-        unique_together = (('member_first_name', 'member_last_name', 'member_email'),)
+        unique_together = (
+            ('member_first_name',
+             'member_last_name',
+             'member_email'),
+        )
 
     def __str__(self):
         return (self.member_first_name + ' ' + self.member_last_name)
@@ -99,7 +106,10 @@ class Rental(models.Model):
     member = models.ForeignKey(Member, models.PROTECT)
     library = models.ForeignKey(Library, models.PROTECT)
     rental_date = models.DateField()
-    rental_status = models.CharField(max_length=7, choices=RENTAL_STATUS_CHOICES)
+    rental_status = models.CharField(
+        max_length=7,
+        choices=RENTAL_STATUS_CHOICES
+    )
 
     class Meta:
         managed = False
@@ -110,7 +120,10 @@ class RentalItem(models.Model):
     rental_item_id = models.CharField(primary_key=True, max_length=255)
     rental = models.ForeignKey(Rental, models.CASCADE)
     resource = models.ForeignKey(Resource, models.CASCADE)
-    rental_item_status = models.CharField(max_length=11, choices=RENTAL_ITEM_STATUS_CHOICES)
+    rental_item_status = models.CharField(
+        max_length=11,
+        choices=RENTAL_ITEM_STATUS_CHOICES
+    )
     return_date = models.DateField(blank=True, null=True)
     queue_pos = models.IntegerField(default=0)
 
