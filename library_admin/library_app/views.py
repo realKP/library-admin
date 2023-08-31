@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views import generic, View
-from django.db.models import Count, F
+from django.db.models import Count, F, Value, Case, When, Q
 from .forms import MemberForm, ResourceForm, EditResourceForm, \
     LibraryResourceForm, BookForm, LibraryRentalForm, RentalItemForm
 from .models import Member, Library, Book, Author, Resource, Rental, \
@@ -88,7 +88,12 @@ class DeleteMember(View):
         Custom handler for 'DELETE' requests
         """
         member = get_object_or_404(Member, pk=kwargs['pk'])
-        member.delete()
+        rentals = Rental.objects.filter(member_id=kwargs['pk'])
+
+        # only members with no rental history can be deleted
+        if not rentals:
+            member.delete()
+
         # redirect to members page
         return HttpResponseRedirect(reverse("library_app:members"))
 
@@ -127,12 +132,43 @@ class MemberView(generic.DetailView):
         else:
             context["saved"] = False
 
-        # retrieves member's rental history
-        context["rentals"] = Rental.objects.\
+        # member's rental history; counts total items and statuses
+        rentals = Rental.objects.\
             filter(member_id=kwargs['object'].member_id).\
             order_by("-rental_date").\
-            select_related("library").\
-            annotate(Count("rentalitem"))   # how many items are in each rental
+            annotate(
+                rentalitem__count=Count(
+                    "rentalitem",
+                    distinct=True
+                )
+            ).\
+            annotate(
+                rentalitem__overdue=Count(
+                    "rentalitem",
+                    distinct=True,
+                    filter=Q(rentalitem__rental_item_status="OVERDUE")
+                ),
+            ).\
+            annotate(
+                rentalitem__closed=Count(
+                    "rentalitem",
+                    distinct=True,
+                    filter=Q(rentalitem__rental_item_status="RETURNED")
+                ),
+            ).\
+            select_related("library")
+
+        # updates rental status if any items overdue
+        for rental in rentals:
+            if rental.rentalitem__overdue > 0:
+                rental.rental_status = "OVERDUE"
+            elif rental.rentalitem__count == rental.rentalitem__closed:
+                rental.rental_status = "CLOSED"
+            else:
+                rental.rental_status = "OPEN"
+            rental.save()
+        context["rentals"] = rentals
+
         return context
 
     def patch(self, request, *args, **kwargs):
@@ -332,6 +368,7 @@ class AddLibraryRental(View):
                     return_date = None
 
                 rental_item = RentalItem(
+                    rental_item_id=str(new_rental.rental_id) + "-" + str(resource.resource_id),
                     rental=new_rental,
                     resource=resource,
                     rental_item_status=status,

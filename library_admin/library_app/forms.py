@@ -1,7 +1,7 @@
 from django import forms
 from library_app.models import Member, Resource, Book, Rental, RentalItem
 from django.utils.translation import gettext_lazy as _
-from datetime import date
+from datetime import date, timedelta
 
 
 class MemberForm(forms.ModelForm):
@@ -104,22 +104,13 @@ class EditResourceForm(ResourceForm):
 
     class Meta(ResourceForm.Meta):
         fields = [
-            "quantity_available",
-            "queue_num"
+            "quantity_available"
         ]
         labels = {
-            "quantity_available": _("QTY Available"),
-            "queue_num": _("Waitlist")
+            "quantity_available": _("QTY Available")
         }
         widgets = {
             "quantity_available": forms.NumberInput(
-                attrs={
-                    "class": "form-control",
-                    "min": 0,
-                    "max": 100
-                }
-            ),
-            "queue_num": forms.NumberInput(
                 attrs={
                     "class": "form-control",
                     "min": 0,
@@ -278,11 +269,20 @@ class LibraryRentalForm(RentalForm):
 class RentalItemForm(forms.ModelForm):
     class Meta:
         model = RentalItem
-        fields = ["rental_item_status"]
+        fields = ["return_date", "rental_item_status"]
         labels = {
+            "return_date": _("Return Date"),
             "rental_item_status": _("Rental Item Status")
         }
         widgets = {
+            "return_date": forms.DateInput(
+                attrs={
+                    "class": "form-control",
+                    "type": "date",
+                    "max": date.today() + timedelta(days=14),
+                    "min": "2023-01-01"
+                }
+            ),
             "rental_item_status": forms.Select(
                 attrs={
                     "class": "form-control"

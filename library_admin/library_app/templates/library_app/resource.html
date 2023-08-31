@@ -8,8 +8,10 @@
     </div>
     <div class="container-fluid">
         <p>ISBN: {{resource.isbn}}</p>
+        <p>Title: {{resource.isbn.book_title}}</p>
         <p>Library: {{resource.library}}</p>
         <p>QTY Checked Out: {{resource.quantity_checked_out}}</p>
+        <p>Waitlist: {{resource.queue_num}}</p>
     </div>
     {% if saved == "Error" %}
         <div class="alert alert-danger alert-dismissible" role="alert">
