@@ -158,7 +158,7 @@ class MemberView(generic.DetailView):
             ).\
             select_related("library")
 
-        # updates rental status if any items overdue
+        # updates rental status based on items' statuses
         for rental in rentals:
             if rental.rentalitem__overdue > 0:
                 rental.rental_status = "OVERDUE"
@@ -248,12 +248,48 @@ class LibraryView(generic.ListView):
         library = get_object_or_404(Library, pk=self.kwargs['pk'])
         context["library"] = library
 
-        # rentals info
-        context["rentals"] = Rental.objects.\
+        # library's rental history; counts total items and statuses
+        # context["rentals"] = Rental.objects.\
+        #     filter(library_id=self.kwargs['pk']).\
+        #     order_by("-rental_date").\
+        #     annotate(Count("rentalitem")).\
+        #     select_related("member")
+
+        rentals = Rental.objects.\
             filter(library_id=self.kwargs['pk']).\
             order_by("-rental_date").\
-            annotate(Count("rentalitem")).\
+            annotate(
+                rentalitem__count=Count(
+                    "rentalitem",
+                    distinct=True
+                )
+            ).\
+            annotate(
+                rentalitem__overdue=Count(
+                    "rentalitem",
+                    distinct=True,
+                    filter=Q(rentalitem__rental_item_status="OVERDUE")
+                ),
+            ).\
+            annotate(
+                rentalitem__closed=Count(
+                    "rentalitem",
+                    distinct=True,
+                    filter=Q(rentalitem__rental_item_status="RETURNED")
+                ),
+            ).\
             select_related("member")
+
+        # updates rental status based on items' statuses
+        for rental in rentals:
+            if rental.rentalitem__overdue > 0:
+                rental.rental_status = "OVERDUE"
+            elif rental.rentalitem__count == rental.rentalitem__closed:
+                rental.rental_status = "CLOSED"
+            else:
+                rental.rental_status = "OPEN"
+            rental.save()
+        context["rentals"] = rentals
 
         # forms info
         resource_form = LibraryResourceForm(
@@ -281,6 +317,7 @@ class LibraryView(generic.ListView):
             context["saved"] = True
         else:
             context["saved"] = False
+
         return context
 
     def post(self, request, *args, **kwargs):
