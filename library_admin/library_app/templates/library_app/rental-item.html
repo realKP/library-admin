@@ -9,7 +9,7 @@
     <div class="container-fluid">
         <p>Rental ID: {{rental_item.rental_id}}</p>
         <p>Book Title: {{rental_item.resource.isbn.book_title}}</p>
-        <p>Return Date: {{rental_item.rental_date}}</p>
+        <p>Return Date: {{rental_item.return_date}}</p>
         <p>Waitlist Spot: {{rental_item.queue_pos}}</p>
     </div>
     {% if saved == "Error" %}

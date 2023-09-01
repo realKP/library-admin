@@ -2,12 +2,12 @@ from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views import generic, View
-from django.db.models import Count, F, Value, Case, When, Q
+from django.db.models import Count, F
 from .forms import MemberForm, ResourceForm, EditResourceForm, \
     LibraryResourceForm, BookForm, LibraryRentalForm, RentalItemForm
 from .models import Member, Library, Book, Author, Resource, Rental, \
     RentalItem, BookAuthor
-from .utility_functions import clean_authors
+from .utility_functions import clean_authors, update_rental_status
 from datetime import date, timedelta
 
 
@@ -132,42 +132,8 @@ class MemberView(generic.DetailView):
         else:
             context["saved"] = False
 
-        # member's rental history; counts total items and statuses
-        rentals = Rental.objects.\
-            filter(member_id=kwargs['object'].member_id).\
-            order_by("-rental_date").\
-            annotate(
-                rentalitem__count=Count(
-                    "rentalitem",
-                    distinct=True
-                )
-            ).\
-            annotate(
-                rentalitem__overdue=Count(
-                    "rentalitem",
-                    distinct=True,
-                    filter=Q(rentalitem__rental_item_status="OVERDUE")
-                ),
-            ).\
-            annotate(
-                rentalitem__closed=Count(
-                    "rentalitem",
-                    distinct=True,
-                    filter=Q(rentalitem__rental_item_status="RETURNED")
-                ),
-            ).\
-            select_related("library")
-
-        # updates rental status based on items' statuses
-        for rental in rentals:
-            if rental.rentalitem__overdue > 0:
-                rental.rental_status = "OVERDUE"
-            elif rental.rentalitem__count == rental.rentalitem__closed:
-                rental.rental_status = "CLOSED"
-            else:
-                rental.rental_status = "OPEN"
-            rental.save()
-        context["rentals"] = rentals
+        # member's rental history with counts of total items and statuses
+        context["rentals"] = update_rental_status(kwargs['object'].member_id, "member")
 
         return context
 
@@ -248,48 +214,8 @@ class LibraryView(generic.ListView):
         library = get_object_or_404(Library, pk=self.kwargs['pk'])
         context["library"] = library
 
-        # library's rental history; counts total items and statuses
-        # context["rentals"] = Rental.objects.\
-        #     filter(library_id=self.kwargs['pk']).\
-        #     order_by("-rental_date").\
-        #     annotate(Count("rentalitem")).\
-        #     select_related("member")
-
-        rentals = Rental.objects.\
-            filter(library_id=self.kwargs['pk']).\
-            order_by("-rental_date").\
-            annotate(
-                rentalitem__count=Count(
-                    "rentalitem",
-                    distinct=True
-                )
-            ).\
-            annotate(
-                rentalitem__overdue=Count(
-                    "rentalitem",
-                    distinct=True,
-                    filter=Q(rentalitem__rental_item_status="OVERDUE")
-                ),
-            ).\
-            annotate(
-                rentalitem__closed=Count(
-                    "rentalitem",
-                    distinct=True,
-                    filter=Q(rentalitem__rental_item_status="RETURNED")
-                ),
-            ).\
-            select_related("member")
-
-        # updates rental status based on items' statuses
-        for rental in rentals:
-            if rental.rentalitem__overdue > 0:
-                rental.rental_status = "OVERDUE"
-            elif rental.rentalitem__count == rental.rentalitem__closed:
-                rental.rental_status = "CLOSED"
-            else:
-                rental.rental_status = "OPEN"
-            rental.save()
-        context["rentals"] = rentals
+        # library's rental history with counts of total items and statuses
+        context["rentals"] = update_rental_status(self.kwargs['pk'], "library")
 
         # forms info
         resource_form = LibraryResourceForm(
