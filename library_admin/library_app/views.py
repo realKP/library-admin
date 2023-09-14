@@ -7,7 +7,8 @@ from .forms import MemberForm, ResourceForm, EditResourceForm, \
     LibraryResourceForm, BookForm, LibraryRentalForm, RentalItemForm
 from .models import Member, Library, Book, Author, Resource, Rental, \
     RentalItem, BookAuthor
-from .utility_functions import clean_authors, update_rental_status
+from .utility_functions import clean_authors, update_rental_status, \
+    update_rental_item_status
 from datetime import date, timedelta
 
 
@@ -380,6 +381,8 @@ class RentalItemsView(generic.ListView):
         """
         Custom query for rental items and related members, resources, and books
         """
+        update_rental_item_status(self.kwargs['pk'])
+
         return RentalItem.objects.\
             filter(rental_id=self.kwargs['pk']).\
             select_related("rental", "rental__member", "resource", "resource__isbn")
