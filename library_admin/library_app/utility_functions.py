@@ -14,23 +14,23 @@ def clean_authors(authors: str):
     return authors_clean
 
 
-def update_rental_item_status(id: int, filter: str):
+def update_rental_item_status(id: int, filter: str = None):
     """
     Updates statuses of past due rental items.
-    Returns True if updates are successful, False otherwise.
+    Returns the number of objects matched (not objects
+    updated since objects may already have status updated).
     """
     if filter == "library":
         rental_items = RentalItem.objects.\
             filter(rental__library_id=id, return_date__lt=date.today())
-        rental_items.update(rental_item_status="OVERDUE")
-        return True
     elif filter == "member":
         rental_items = RentalItem.objects.\
             filter(rental__member_id=id, return_date__lt=date.today())
-        rental_items.update(rental_item_status="OVERDUE")
-        return True
+    else:
+        rental_items = RentalItem.objects.\
+            filter(rental_id=id, return_date__lt=date.today())
 
-    return False
+    return rental_items.update(rental_item_status="OVERDUE")
 
 
 def update_rental_status(id: int, filter: str):
