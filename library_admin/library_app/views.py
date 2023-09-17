@@ -8,7 +8,7 @@ from .forms import MemberForm, ResourceForm, EditResourceForm, \
 from .models import Member, Library, Book, Author, Resource, Rental, \
     RentalItem, BookAuthor
 from .utility_functions import clean_authors, update_rental_status, \
-    update_rental_item_status
+    update_rental_item_status, update_queue
 from datetime import date, timedelta
 
 
@@ -443,9 +443,15 @@ class RentalItemView(generic.ListView):
         Custom handler for 'PATCH' requests
         """
         rental_item = self.get_queryset()
+        prev_status = rental_item.rental_item_status
         form = RentalItemForm(request.POST, instance=rental_item)
+        # prev_status = rental_item.rental_item_status
         if form.is_valid():
             form.save()
+
+            # update wait list for respective resource
+            update_queue(rental_item, prev_status, form.cleaned_data["rental_item_status"])
+
             # redirect to rental item page to display updated info
             return HttpResponseRedirect(
                 reverse("library_app:rental-item", args=[self.kwargs['rental'], self.kwargs['resource']]) + '?saved=True'

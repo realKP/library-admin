@@ -1,6 +1,9 @@
 from django.db.models import Count, Q
 from .models import Rental, RentalItem
 from datetime import date
+from .models import Resource, Rental, RentalItem
+from django.shortcuts import get_object_or_404
+from django.db.models import F, Case, When
 
 
 def clean_authors(authors: str):
@@ -106,3 +109,35 @@ def update_rental_status(id: int, filter: str):
         rental.save()
 
     return rentals
+
+
+def update_queue(rental_item, prev_status: str, new_status: str):
+    """
+    Updates resource wait list for related rental item and the queue positions
+    of rental items with reservations for said resource.
+    Returns tuple of number of resources updated (0 or 1) and number of rental
+    items updated, respectively.
+    """
+
+    # only for items whose status changed and that are returned 
+    if new_status != "RETURNED" or prev_status == new_status:
+        return (0, 0)
+
+    resource = get_object_or_404(Resource, pk=rental_item.resource.resource_id)
+    if resource.queue_num < 0:
+        # shouldn't happen
+        return (0, 0)
+    elif resource.queue_num > 0:
+        rental_items = RentalItem.objects.\
+            filter(
+                resource_id=resource.resource_id,
+                rental_item_status="RESERVED",
+                queue_pos__gte=1
+            )
+        
+
+
+        return
+    else:
+        resource.quantity_available = F("quantity_available") + 1
+        resource.quantity_checked_out = F("quantity_checked_out") - 1
