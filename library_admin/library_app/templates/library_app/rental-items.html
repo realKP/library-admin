@@ -29,7 +29,7 @@
                 <tr>
                     <th>Resource ID</th>
                     <th>Title</th>
-                    <th>Waitlist</th>
+                    <th>Waitlist Spot</th>
                     <th>Status</th>
                     <th>Return Date</th>
                 </tr>
@@ -53,11 +53,14 @@
                             {{ rental_item.return_date }}
                         </td>
                         <td>
-                            <div class="container-fluid">
-                                <a class="btn btn-secondary" href="{% url 'library_app:rental-item' rental=rental_item.rental.rental_id resource=rental_item.resource_id %}">
-                                    Edit
-                                </a>
-                            </div>
+                            {% if rental_item.rental_item_status != "RETURNED" %}
+                                <div class="container-fluid">
+                                    <a class="btn btn-secondary" href="{% url 'library_app:rental-item' rental=rental_item.rental.rental_id resource=rental_item.resource_id %}">
+                                        Edit
+                                    </a>
+                                </div>
+                            {% else %}
+                            {% endif %}
                         </td>
                     </tr>
                 {% endfor %}

@@ -1,9 +1,8 @@
 from django.db.models import Count, Q
-from .models import Rental, RentalItem
-from datetime import date
-from .models import Resource, Rental, RentalItem
+from .models import Rental, RentalItem, Resource
+from datetime import date, timedelta
 from django.shortcuts import get_object_or_404
-from django.db.models import F, Case, When
+from django.db.models import F
 
 
 def clean_authors(authors: str):
@@ -113,31 +112,50 @@ def update_rental_status(id: int, filter: str):
 
 def update_queue(rental_item, prev_status: str, new_status: str):
     """
-    Updates resource wait list for related rental item and the queue positions
-    of rental items with reservations for said resource.
+    Updates resource waitlist for related rental item and the waitlist
+    positions of rental items with reservations for said resource.
     Returns tuple of number of resources updated (0 or 1) and number of rental
-    items updated, respectively.
+    items' waitlist spot updated, respectively.
     """
 
-    # only for items whose status changed and that are returned 
+    # only for items whose status changed and that are returned
     if new_status != "RETURNED" or prev_status == new_status:
         return (0, 0)
 
     resource = get_object_or_404(Resource, pk=rental_item.resource.resource_id)
     if resource.queue_num < 0:
-        # shouldn't happen
+        # queue_num should be GTE 0
         return (0, 0)
     elif resource.queue_num > 0:
-        rental_items = RentalItem.objects.\
+        # waitlist exists, decrement waitlist
+        resource.queue_num = F("queue_num") - 1
+        resource.save()
+
+        # decrement all waitlist spots
+        items_updated = RentalItem.objects.\
             filter(
                 resource_id=resource.resource_id,
                 rental_item_status="RESERVED",
                 queue_pos__gte=1
+            ).update(
+                queue_pos=F("queue_pos") - 1
             )
-        
 
+        # next up in waitlist
+        RentalItem.objects.\
+            filter(
+                resource_id=resource.resource_id,
+                rental_item_status="RESERVED",
+                queue_pos=0
+            ).update(
+                rental_item_status="CHECKED OUT",
+                return_date=date.today() + timedelta(days=14)
+            )
 
-        return
+        return (0, items_updated)
     else:
+        # no waitlist, only resource updated
         resource.quantity_available = F("quantity_available") + 1
         resource.quantity_checked_out = F("quantity_checked_out") - 1
+        resource.save()
+        return (1, 0)
