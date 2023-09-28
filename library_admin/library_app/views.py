@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404, render
+from django.core.paginator import Paginator
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views import generic, View
@@ -26,7 +27,8 @@ class MembersView(generic.ListView):
     template_name = "library_app/members.html"
     context_object_name = "members"
     # queries for all members
-    queryset = Member.objects.all()
+    queryset = Member.objects.all().order_by('member_last_name')
+    paginate_by = 5
 
     def get_context_data(self, **kwargs):
         # every request (GET or POST) receives blank form for modal
@@ -57,13 +59,17 @@ class MembersView(generic.ListView):
                 reverse("library_app:members") + '?saved=True'
             )
         else:
+            paginator = Paginator(self.queryset, per_page=5)
+            page_object = paginator.get_page(1)
             return render(
                 request,
                 "library_app/members.html",
                 {
                     "members": self.queryset,
                     "form": form,
-                    "saved": "Error"
+                    "saved": "Error",
+                    "paginator": paginator,
+                    "page_obj": page_object
                 }
             )
 
@@ -134,7 +140,14 @@ class MemberView(generic.DetailView):
             context["saved"] = False
 
         # member's rental history with counts of total items and statuses
-        context["rentals"] = update_rental_status(kwargs['object'].member_id, "member")
+        rentals = update_rental_status(kwargs['object'].member_id, "member")
+        context["rentals"] = rentals
+
+        # Paginator objects for table
+        paginator = Paginator(rentals, per_page=5)
+        page_object = paginator.get_page(1)
+        context["paginator"] = paginator
+        context["page_obj"] = page_object
 
         return context
 
@@ -151,13 +164,19 @@ class MemberView(generic.DetailView):
                 reverse("library_app:member", args=[member.member_id]) + '?saved=True'
             )
         else:
+            rentals = update_rental_status(member.member_id, "member")
+            paginator = Paginator(rentals, per_page=5)
+            page_object = paginator.get_page(1)
+
             return render(
                 request,
                 "library_app/member.html",
                 {
                     "member": member,
                     "form": form,
-                    "saved": "Error"
+                    "saved": "Error",
+                    "paginator": paginator,
+                    "page_obj": page_object
                 }
             )
 
@@ -169,7 +188,8 @@ class LibrariesView(generic.ListView):
     template_name = "library_app/libraries.html"
     context_object_name = "libraries"
     # queries for all libraries
-    queryset = Library.objects.all()
+    queryset = Library.objects.all().order_by("library_id")
+    paginate_by = 5
 
 
 class LibraryView(generic.ListView):
@@ -475,7 +495,9 @@ class ResourcesView(generic.ListView):
     template_name = "library_app/resources.html"
     context_object_name = "resources"
     # queries for all resources
-    queryset = Resource.objects.all().select_related("isbn")
+    queryset = Resource.objects.all().select_related("isbn").\
+        order_by("isbn__book_title")
+    paginate_by = 10
 
     def get_context_data(self, **kwargs):
         # every request (GET or POST) receives blank form for modal
@@ -506,13 +528,17 @@ class ResourcesView(generic.ListView):
                 reverse("library_app:resources") + '?saved=True'
             )
         else:
+            paginator = Paginator(self.get_queryset(), per_page=10)
+            page_object = paginator.get_page(1)
             return render(
                 request,
                 "library_app/resources.html",
                 {
                     "resources": self.get_queryset(),
                     "form": form,
-                    "saved": "Error"
+                    "saved": "Error",
+                    "paginator": paginator,
+                    "page_obj": page_object
                 }
             )
 
@@ -583,13 +609,14 @@ class BooksView(generic.ListView):
     """
     template_name = "library_app/books.html"
     context_object_name = "books"
+    paginate_by = 5
 
     def get_queryset(self):
         """
         Custom query for books and related resource and author info
         """
         context = []
-        books = Book.objects.all()
+        books = Book.objects.all().order_by("book_title")
         for book in books:
             info = {}
             info["isbn"] = book.isbn
@@ -644,12 +671,16 @@ class BooksView(generic.ListView):
             # redirect to books page to display new book
             return HttpResponseRedirect(reverse("library_app:books") + '?saved=True')
         else:
+            paginator = Paginator(self.get_queryset(), per_page=5)
+            page_object = paginator.get_page(1)
             return render(
                 request,
                 "library_app/books.html",
                 {
                     "books": self.get_queryset(),
                     "form": form,
-                    "saved": "Error"
+                    "saved": "Error",
+                    "paginator": paginator,
+                    "page_obj": page_object
                 }
             )

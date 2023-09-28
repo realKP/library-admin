@@ -62,7 +62,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for resource in resources %}
+                {% for resource in page_obj %}
                     <tr>
                         <td>
                             {{ resource.resource_id }}
@@ -96,5 +96,26 @@
                 {% endfor %}
             </tbody>
         </table>
+        <nav aria-label="Libraries table navigation">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{page_obj.previous_page_number}}">Previous</a></li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                {% endif%}
+                {% for page_number in page_obj.paginator.page_range %}
+                    {% if page_number == page_obj.number %}
+                        <li class="page-item active"><a class="page-link" href="?page={{page_number}}">{{page_number}}</a></li>
+                    {% else %}
+                        <li class="page-item"><a class="page-link" href="?page={{page_number}}">{{page_number}}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{page_obj.next_page_number}}">Next</a></li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">Next</span></li>
+                {% endif%}
+            </ul>
+        </nav>
     </div>
 {% endblock %}
