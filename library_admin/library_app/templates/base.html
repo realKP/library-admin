@@ -8,6 +8,7 @@
         {% load bootstrap5 %}
         {% bootstrap_css %}
         {% bootstrap_javascript %}
+        <link href="{% static 'css/styles.css' %}" rel="stylesheet">
         <link href="{% static 'images/favicon.ico' %}" rel="shortcut icon" type="image/x-icon">
     </head>
     <body>
@@ -30,13 +31,5 @@
         </nav>
         {% block content %}
         {% endblock %}
-    <footer class="footer fixed-bottom bg-dark">
-        <div class="container-fluid">
-            <div class="row">
-                <a href="https://www.vecteezy.com/free-photos">Free Stock photos by Vecteezy</a>
-                <a href="https://www.freepik.com/free-photo">Images by Freepik</a>
-            </div>
-        </div>
-    </footer>
     </body>
 </html>

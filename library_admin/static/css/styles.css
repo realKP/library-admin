@@ -1,0 +1,9 @@
+.footer-text {
+    color: rgba(255,255,255,.55);
+    text-decoration: none;
+    
+}
+
+a.footer-text:hover {
+    color: white
+}
