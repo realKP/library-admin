@@ -7,10 +7,10 @@
         <h1>Rental Item</h1>
     </div>
     <div class="container-fluid">
-        <p>Rental ID: {{rental_item.rental_id}}</p>
-        <p>Book Title: {{rental_item.resource.isbn.book_title}}</p>
-        <p>Return Date: {{rental_item.return_date}}</p>
-        <p>Waitlist Spot: {{rental_item.queue_pos}}</p>
+        <p><b>Rental ID</b>: {{rental_item.rental_id}}</p>
+        <p><b>Book Title</b>: {{rental_item.resource.isbn.book_title}}</p>
+        <p><b>Return Date</b>: {{rental_item.return_date}}</p>
+        <p><b>Waitlist Spot</b>: {{rental_item.queue_pos}}</p>
     </div>
     {% if saved == "Error" %}
         <div class="alert alert-danger alert-dismissible" role="alert">

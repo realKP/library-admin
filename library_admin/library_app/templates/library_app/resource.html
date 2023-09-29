@@ -7,11 +7,11 @@
         <h1>Resource {{resource.resource_id}}</h1>
     </div>
     <div class="container-fluid">
-        <p>ISBN: {{resource.isbn}}</p>
-        <p>Title: {{resource.isbn.book_title}}</p>
-        <p>Library: {{resource.library}}</p>
-        <p>QTY Checked Out: {{resource.quantity_checked_out}}</p>
-        <p>Waitlist: {{resource.queue_num}}</p>
+        <p><b>ISBN</b>: {{resource.isbn}}</p>
+        <p><b>Title</b>: {{resource.isbn.book_title}}</p>
+        <p><b>Library</b>: {{resource.library}}</p>
+        <p><b>QTY Checked Out</b>: {{resource.quantity_checked_out}}</p>
+        <p><b>Waitlist</b>: {{resource.queue_num}}</p>
     </div>
     {% if saved == "Error" %}
         <div class="alert alert-danger alert-dismissible" role="alert">

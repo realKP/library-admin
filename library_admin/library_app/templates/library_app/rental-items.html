@@ -5,12 +5,12 @@
     <div class="container-fluid">
         <h1>Rental Items</h1>
     </div>
-    <div class="container-fluid">
-        <p>Rental ID: {{rental.rental_id}}</p>
-        <p>Member: {{rental.member}} | ID: {{rental.member.member_id}}</p>
-        <p>Library: {{rental.library}}</p>
-        <p>Rental Date: {{rental.rental_date}}</p>
-        <p>Rental Status: {{rental.rental_status}}</p>
+    <div class="container-fluid mb-4">
+        <p><b>Rental ID</b>: {{rental.rental_id}}</p>
+        <p><b>Member</b>: {{rental.member}} | ID: {{rental.member.member_id}}</p>
+        <p><b>Library</b>: {{rental.library}}</p>
+        <p><b>Rental Date</b>: {{rental.rental_date}}</p>
+        <p><b>Rental Status</b>: {{rental.rental_status}}</p>
     </div>
     {% if saved == "Error" %}
         <div class="alert alert-danger alert-dismissible" role="alert">
