@@ -7,3 +7,19 @@
 a.footer-text:hover {
     color: white
 }
+
+div>form>div>input{
+    max-width: 40rem
+}
+
+input[type^=date]{
+    max-width: 10rem
+}
+
+input[type^=number]{
+    max-width: 5rem
+}
+
+select[name^=rental_item]{
+    max-width: 10rem
+}

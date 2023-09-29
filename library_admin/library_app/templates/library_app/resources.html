@@ -3,9 +3,9 @@
 
 {% load crispy_forms_tags %}
 {% block content %}
-    <div class="container-fluid">
+    <div class="container-fluid mb-4">
         <h1>Resources</h1>
-        <p>Welcome to the Resources directory</p>
+        <p>Click <i>Edit</i> on a resource to update how many copies are available.</p>
     </div>
     {% if saved == "Error" %}
         <div class="alert alert-danger alert-dismissible" role="alert">
@@ -49,7 +49,7 @@
         </div>
     </div>
     <div class="container-fluid">
-        <table class="table table-striped table-hover">
+        <table class="table table-striped table-hover mt-3">
             <thead>
                 <tr>
                     <th>Resource ID</th>

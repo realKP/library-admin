@@ -3,9 +3,9 @@
 
 {% load crispy_forms_tags %}
 {% block content %}
-    <div class="container-fluid">
+    <div class="container-fluid mb-4">
         <h1>Books</h1>
-        <p>Welcome to the Book directory</p>
+        <p>Click <i>Availability</i> on a book to view which branches have that resource.</p>
     </div>
     {% if saved == "Error" %}
         <div class="alert alert-danger alert-dismissible" role="alert">
@@ -57,7 +57,7 @@
         </div>
     </div>
     <div class="container-fluid">
-        <table class="table table-striped table-hover">
+        <table class="table table-striped table-hover mt-3">
             <thead>
                 <tr>
                     <th>ISBN</th>
