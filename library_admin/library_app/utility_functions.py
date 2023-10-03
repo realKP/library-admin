@@ -24,13 +24,16 @@ def update_rental_item_status(id: int, filter: str = None):
     """
     if filter == "library":
         rental_items = RentalItem.objects.\
-            filter(rental__library_id=id, return_date__lt=date.today())
+            filter(rental__library_id=id, return_date__lt=date.today()).\
+            exclude(rental_item_status="RETURNED")
     elif filter == "member":
         rental_items = RentalItem.objects.\
-            filter(rental__member_id=id, return_date__lt=date.today())
+            filter(rental__member_id=id, return_date__lt=date.today()).\
+            exclude(rental_item_status="RETURNED")
     else:
         rental_items = RentalItem.objects.\
-            filter(rental_id=id, return_date__lt=date.today())
+            filter(rental_id=id, return_date__lt=date.today()).\
+            exclude(rental_item_status="RETURNED")
 
     return rental_items.update(rental_item_status="OVERDUE")
 
