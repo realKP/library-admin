@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, render
 from django.core.paginator import Paginator
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.views import generic, View
 from django.db.models import Count, F
@@ -18,6 +18,10 @@ def index(request):
     Home page
     """
     return render(request, "library_app/index.html", {})
+
+
+def ping(request):
+    return HttpResponse(status=200)
 
 
 class MembersView(generic.ListView):

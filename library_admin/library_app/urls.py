@@ -27,4 +27,6 @@ urlpatterns = [
     path("resources/<int:pk>/", views.ResourceView.as_view(), name="resource"),
     # books page
     path("books/", views.BooksView.as_view(), name="books"),
+    # for aws EC2 healthcheck
+    path("ping/", views.ping, name="ping")
 ]
