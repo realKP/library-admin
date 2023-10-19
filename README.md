@@ -10,7 +10,7 @@ Link to site: [http://city-public-library.eba-9hgqkiku.us-west-2.elasticbeanstal
   - [Outline](#outline "Outline")
 
 ## Overview <a name="overview"></a>
-This project is a mock library administrative web app for the imaginary City Public Library network. The library admin site allows library workers to view, edit, add, and delete members, library branches, books, rentals, and resources (stocks of books at a particular branch). In a real production scenario, the web app would include user authentication; however, that was foregone in this mockup to make it more easily explorable. The application is written using Python, Django, and Bootstrap. It is deployed through Amazon Web Service's Elastic Beanstalk with a MySQL database.
+This project is a mock library administrative web app for the imaginary City Public Library network. The library admin site allows library workers to view, edit, add, and delete members, library branches, books, rentals, and resources (stocks of books at a particular branch). In a real production scenario, the web app would include user authentication; however, that was foregone in this mockup to make it more easily explorable. The application is written using Python, HTML/CSS, Django, and Bootstrap. It is deployed through Amazon Web Service's Elastic Beanstalk with a MySQL database.
 
 ## Usage <a name="usage"></a>
 
@@ -34,7 +34,7 @@ For a thorough explanation of the notation used in the ERD below, feel free to r
 The schema below illustrates the primary and foreign key relationships between the various entities. The underlined attributes are the primary key for that entity.
 
 
-![Database schema](https://github.com/realKP/library-admin/assets/76978772/dc9edcf2-10ba-4a80-8757-ae297664ff25)
+![image](https://github.com/realKP/library-admin/assets/76978772/fa7ae6b8-fab2-4651-beef-4548766d682e)
 
 
 ### Outline <a name="outline"></a>
@@ -47,66 +47,67 @@ _Note: since most attributes are not nullable, nullable is used where attributes
   - member_phone: VARCHAR
   - member_email: VARCHAR
   - Relationships:
-    - A Rental request can have only one Member associated with it, but a Member can have zero or more Rentals.
+    - A Rental can have only one Member associated with it, but a Member can have zero or more Rentals.
 
 - Rentals: records the details of the rental requests from members.
   - rental_ID: INT, auto increment, unique, PK
   - member_ID: INT, FK
   - library_ID: INT, FK
   - rental_date: DATE
+  - rental_status: VARCHAR
   - Relationships:
-    - a 1:M relationship between Rentals and Rental_Items with rental_ID as FK in Rental_Items
-    - see Libraries
+    - A Library can have zero or more Rentals, but a Rental can have only one Library associated with it.
+    - A Rental Item can only be associated with one Rental, but a Rental can have one or more Rental Items.
+    - _See Members_
 
-- Rental_Items: records the information about a specific line item for a resource in a
-rental request. Each member can only rent a single instance of a resource per rental
-request.
-  - rental_ID: INT, FK, composite PK
-  - resource_ID: INT, FK, composite PK
+- Rental_Items: records the information about a specific line item for a resource in a rental request.
+  - rental_item_ID: VARCHAR, unique, PK
+  - rental_ID: INT, FK
+  - resource_ID: INT, FK
   - queue_num: INT
   - rental_item_status: VARCHAR
   - return_date: DATE nullable
   - Relationships:
-  - Is the relation table for the M:M between Rentals and Resources
-  - see Rentals
-  - see Resources
+    - A Resource can have zero or more Rental Items associated with it, but a Rental Item can only refer to one Resource.
+    - _See Rentals_
 
-- Resources: records the stock of a book at a particular library in the network.
+- Resources: records the stock of a book at a particular library branch in the network.
   - resource_ID: INT, auto increment, unique, PK
   - isbn: VARCHAR, FK
   - library_ID: INT, FK
   - quantity_available: INT
   - quantity_checked_out: INT
-  - Relationship: a 1:M relationship between Resources and Rental_Items with
-  resource_ID as FK in Rental_Items
-  - see Libraries
-  - see Books
+  - queue_num: INT
+  - Relationship: 
+    - A Library can have one or more Resources, but a Resource can only belong to one Library.
+    - A Book can be associated with zero or more Resources, but a Resource can refer to only one Book.
+    - _See Rental_Items_
 
 - Books: records the title of a book that may or may not be a resource in the network.
   - isbn: VARCHAR, unique, PK
   - book_title: VARCHAR
-  - Relationships: a 1:M relationship between Books and Resources with isbn as FK
-  in Resources
-  - See Books_Authors
+  - Relationships:
+    - A Books_Author can belong to only one Book, but a Book can have one or more Books_Authors.
+    - _See Resources_
 
 - Authors: records the different authors of books.
   - author_ID: INT, auto increment, unique, PK
   - author_name: VARCHAR
-  - Relationships: see Books_Authors
+  - Relationships:
+    - A Books_Author can refer to only one Author, but an Author can have zero or more Books_Authors relations.
 
 -Books_Authors: an intersection table between Books and Authors.
   - author_ID: INT, FK, composite PK
   - isbn: VARCHAR, FK, composite PK
-  - Relationships: 1:M relationships with each Books and Authors with their PKs
-  comprising the composite PK of the intersection table.
-  - Is the relationship table for the M:M between Books and Authors
+  - Relationships:
+    - _See Books_
+    - _See Authors_
 
-- Libraries: records the details of libraries in the network.
+- Libraries: records the details of library branches in the network.
   - library_ID: INT, auto increment, unique, PK
   - library_name: VARCHAR
   - library_address: VARCHAR
-  - Relationships: a 1:M relationship between Libraries and Rentals with library_ID as
-  FK in Rentals
-  - Relationships: a 1:M relationship between Libraries and Resources with library_ID
-  as FK in Rentals
+  - Relationships:
+    - _See Rentals_
+    - _See Resources_
 
