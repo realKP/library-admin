@@ -96,7 +96,7 @@ _Note: since most attributes are not nullable, nullable is used where attributes
   - Relationships:
     - A Books_Author can refer to only one Author, but an Author can have zero or more Books_Authors relations.
 
--Books_Authors: an intersection table between Books and Authors.
+- Books_Authors: an intersection table between Books and Authors.
   - author_ID: INT, FK, composite PK
   - isbn: VARCHAR, FK, composite PK
   - Relationships:
