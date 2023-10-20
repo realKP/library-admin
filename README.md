@@ -29,7 +29,7 @@ In the Members tab, members can be added or deleted by clicking either of the re
 
 ![Members page](https://github.com/realKP/library-admin/assets/76978772/0b892a99-88cc-4593-9537-523b2d46f6a8)
 
-![Add members modal](https://github.com/realKP/library-admin/assets/76978772/6d664805-12e8-4a2f-a1e0-58fbfbacd6df)
+![Add new member modal](https://github.com/realKP/library-admin/assets/76978772/6d664805-12e8-4a2f-a1e0-58fbfbacd6df)
 
 ![Delete member modal](https://github.com/realKP/library-admin/assets/76978772/4f80e590-2291-4193-a16c-f8d6fc2b7aa5)
 
@@ -38,12 +38,14 @@ In the Members tab, members can be added or deleted by clicking either of the re
 The details and items in a particular rental (rental items) can be viewed by clicking _View_ on a specific rental in a member's rental history. More on this in the [Rentals and Rental Items section](#rentals "Rentals and Rental Items").
 
 ### Libraries <a name="libraries"></a>
-To view a particular library's information such as the resources available at that library or the rentals from that library, click the _View_ button on that library's row in the table.
+To view a particular library's information such as the resources available at that library or the rentals from that library, click the _View_ button on that library's row in the table. On a specific library's page, new resources can be added or new rentals created by clicking the respective button.
 
 ![Libraries page](https://github.com/realKP/library-admin/assets/76978772/bb2229bf-6156-4cfd-b0cc-2c6e7f97a2ea)
 ![Specific library branch page](https://github.com/realKP/library-admin/assets/76978772/d64c3cde-9a74-44f2-89d9-bd6ce46977da)
+![Add new resource modal](https://github.com/realKP/library-admin/assets/76978772/8eb6e8c4-7c6c-40ab-9bbd-127186491488)
+![Create new rental modal](https://github.com/realKP/library-admin/assets/76978772/daec2c84-a002-479e-b312-3b5f22c40dd6)
 
-
+The details and items in a particular rental (rental items) can be viewed by clicking _View_ on a specific rental in the rental's table. More on this in the [Rentals and Rental Items section](#rentals "Rentals and Rental Items"). To edit a resource, click _Edit_ on a specific resource in the resource's table. More on this in the [Resources section](#resources "Resources").
 
 ### Books and Authors <a name="books"></a>
 ### Resources <a name="resources"></a>
