@@ -5,6 +5,11 @@ Link to site: [http://city-public-library.eba-9hgqkiku.us-west-2.elasticbeanstal
 - [Overview](#overview "Overview")
 - [Usage](#usage "Usage")
   - [Visit Library Admin](#visit "Library Admin")
+  - [Members](#members "Members")
+  - [Libraries](#libraries "Libraries")
+  - [Books and Authors](#books "Books and Authors")
+  - [Resources](#resources "Resources")
+  - [Rentals and Rental Items](#rentals "Rentals and Rental Items")
 - [Database Design](#database "Database Design")
   - [Diagrams](#diagrams "Diagrams")
   - [Outline](#outline "Outline")
@@ -17,8 +22,32 @@ This project is a mock library administrative web app for the imaginary City Pub
 ### Visit Issue Tracker <a name="visit"></a>
 Visit Library Admin's home page at the public URL: [http://city-public-library.eba-9hgqkiku.us-west-2.elasticbeanstalk.com](http://city-public-library.eba-9hgqkiku.us-west-2.elasticbeanstalk.com "City Public Library Admin Site")
 
-![image](https://github.com/realKP/library-admin/assets/76978772/a29f1e27-4d7b-4dd0-9e38-5fd24cfa3c66)
+![Home page](https://github.com/realKP/library-admin/assets/76978772/2d0c94d5-06fb-4a40-bef3-5795e17b96bf)
 
+### Members <a name="members"></a>
+In the Members tab, members can be added or deleted by clicking either of the respective buttons on the page. To update a particular member's personal information or view their rental history, click the _View_ button on that member's row in the table.
+
+![Members page](https://github.com/realKP/library-admin/assets/76978772/0b892a99-88cc-4593-9537-523b2d46f6a8)
+
+![Add members modal](https://github.com/realKP/library-admin/assets/76978772/6d664805-12e8-4a2f-a1e0-58fbfbacd6df)
+
+![Delete member modal](https://github.com/realKP/library-admin/assets/76978772/4f80e590-2291-4193-a16c-f8d6fc2b7aa5)
+
+![Specific member view page](https://github.com/realKP/library-admin/assets/76978772/d689b8da-d9f2-45db-aa0f-ee7cd5e525f2)
+
+The details and items in a particular rental (rental items) can be viewed by clicking _View_ on a specific rental in a member's rental history. More on this in the [Rentals and Rental Items section](#rentals "Rentals and Rental Items").
+
+### Libraries <a name="libraries"></a>
+To view a particular library's information such as the resources available at that library or the rentals from that library, click the _View_ button on that library's row in the table.
+
+![Libraries page](https://github.com/realKP/library-admin/assets/76978772/bb2229bf-6156-4cfd-b0cc-2c6e7f97a2ea)
+![Specific library branch page](https://github.com/realKP/library-admin/assets/76978772/d64c3cde-9a74-44f2-89d9-bd6ce46977da)
+
+
+
+### Books and Authors <a name="books"></a>
+### Resources <a name="resources"></a>
+### Rentals and Rental Items <a name="rentals"></a>
 
 ## Database Design <a name="database"></a>
 To provide more detail on how the data in this app relate to each other, I have provided the entity relationship diagram (ERD), schema, and outline used to create the database.
