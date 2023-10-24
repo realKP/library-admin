@@ -45,11 +45,28 @@ To view a particular library's information such as the resources available at th
 ![Add new resource modal](https://github.com/realKP/library-admin/assets/76978772/8eb6e8c4-7c6c-40ab-9bbd-127186491488)
 ![Create new rental modal](https://github.com/realKP/library-admin/assets/76978772/daec2c84-a002-479e-b312-3b5f22c40dd6)
 
-The details and items in a particular rental (rental items) can be viewed by clicking _View_ on a specific rental in the rental's table. More on this in the [Rentals and Rental Items section](#rentals "Rentals and Rental Items"). To edit a resource, click _Edit_ on a specific resource in the resource's table. More on this in the [Resources section](#resources "Resources").
+The details and items in a particular rental (rental items) can be viewed by clicking _View_ on a specific rental in the rentals table. More on this in the [Rentals and Rental Items section](#rentals "Rentals and Rental Items"). To edit a resource, click _Edit_ on a specific resource in the resources table. More on this in the [Resources section](#resources "Resources").
 
 ### Books and Authors <a name="books"></a>
+In the Books tab, books can be added by clicking the _Add New Book_ button. This is also where new authors are added and connected to their books. To view which library branches have a particular book, click the _Availability_ button on a specific book in the books table. Clicking _View Library_ in the modal will redirect to that branches' specific page.
+
+![Books page](https://github.com/realKP/library-admin/assets/76978772/6a034927-7d97-4d78-8e5b-4fee36c3b271)
+![Add new book modal](https://github.com/realKP/library-admin/assets/76978772/c218b061-b367-498e-88f7-fb7d294eaf0a)
+![Resource availability modal](https://github.com/realKP/library-admin/assets/76978772/3778d8f3-0188-4b95-9ad7-6fa3ae025b9b)
+
 ### Resources <a name="resources"></a>
+In the Resources tab, resources can be added by clicking the _Add New Resource_ button.
+
+![Resources page](https://github.com/realKP/library-admin/assets/76978772/06d95546-434e-45ab-a046-b72844cb7a7f)
+![Add new resource modal](https://github.com/realKP/library-admin/assets/76978772/b2003693-a123-4058-9c69-50792e32cb6f)
+
+To edit a particular resource's quantity available, click the _Edit_ button on that resources's row in the table. This page can also be found through the page of the specific library branch at which the resource is located, as mentioned in the [Libraries section](#libraries "Libraries") previously.
+
+![Edit specific resource page](https://github.com/realKP/library-admin/assets/76978772/a6e996c2-ecca-4433-9d5b-1301a6602cad)
+
+
 ### Rentals and Rental Items <a name="rentals"></a>
+There are two ways to access
 
 ## Database Design <a name="database"></a>
 To provide more detail on how the data in this app relate to each other, I have provided the entity relationship diagram (ERD), schema, and outline used to create the database.
