@@ -19,7 +19,7 @@ This project is a mock library administrative web app for the imaginary City Pub
 
 ## Usage <a name="usage"></a>
 
-### Visit Issue Tracker <a name="visit"></a>
+### Visit Library Admin <a name="visit"></a>
 Visit Library Admin's home page at the public URL: [http://city-public-library.eba-9hgqkiku.us-west-2.elasticbeanstalk.com](http://city-public-library.eba-9hgqkiku.us-west-2.elasticbeanstalk.com "City Public Library Admin Site")
 
 ![Home page](https://github.com/realKP/library-admin/assets/76978772/2d0c94d5-06fb-4a40-bef3-5795e17b96bf)
