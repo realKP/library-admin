@@ -48,7 +48,7 @@ To view a particular library's information such as the resources available at th
 The details and items in a particular rental (rental items) can be viewed by clicking _View_ on a specific rental in the rentals table. More on this in the [Rentals and Rental Items section](#rentals "Rentals and Rental Items"). To edit a resource, click _Edit_ on a specific resource in the resources table. More on this in the [Resources section](#resources "Resources").
 
 ### Books and Authors <a name="books"></a>
-In the Books tab, books can be added by clicking the _Add New Book_ button. This is also where new authors are added and connected to their books. To view which library branches have a particular book, click the _Availability_ button on a specific book in the books table. Clicking _View Library_ in the modal will redirect to that branches' specific page.
+In the Books tab, books can be added by clicking the _Add New Book_ button. This is also where new authors are added and connected to their books. To view which library branches have a particular book, click the _Availability_ button on a specific book in the books table. Clicking _View Library_ in the modal will redirect to that branch's specific page.
 
 ![Books page](https://github.com/realKP/library-admin/assets/76978772/6a034927-7d97-4d78-8e5b-4fee36c3b271)
 ![Add new book modal](https://github.com/realKP/library-admin/assets/76978772/c218b061-b367-498e-88f7-fb7d294eaf0a)
@@ -66,7 +66,16 @@ To edit a particular resource's quantity available, click the _Edit_ button on t
 
 
 ### Rentals and Rental Items <a name="rentals"></a>
-There are two ways to access
+There are two ways to access rentals and the rental items included in those rentals. The first is through a particular member's page as described in the [Members section](#members "Members"). The second is through a particular library branch's page as described in the [Libraries section](#libraries "Libraries"). Both methods are depicted again in the following two images:
+
+![Specific member page](https://github.com/realKP/library-admin/assets/76978772/808361fb-d00c-425e-8a7b-9a7490c5a286)
+![Specific library page](https://github.com/realKP/library-admin/assets/76978772/83a59ef9-e268-4e0e-8b24-a07db6ddd9c3)
+
+From either of the two aformentioned pages, clicking _Edit_ on a rental in the rentals table will direct you to a page similar to the first one shown below. From this page, a particular rental item in the rental can be edited by clicking the _Edit_ button. From this page (as shown in the second image), the return date and status can be updated.
+
+![Specific rental page](https://github.com/realKP/library-admin/assets/76978772/a21bd491-aba5-45f7-9290-2bad3a291411)
+![Specific rental item page](https://github.com/realKP/library-admin/assets/76978772/100fb59e-2bb6-48a3-90e8-03b8735c60a7)
+
 
 ## Database Design <a name="database"></a>
 To provide more detail on how the data in this app relate to each other, I have provided the entity relationship diagram (ERD), schema, and outline used to create the database.
